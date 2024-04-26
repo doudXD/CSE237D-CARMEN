@@ -1,27 +1,31 @@
+import robotIMG from "../robot.png";
 function Button() {
-  return(
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh'
-    }}>
-      <button style={{
-        backgroundColor: '#4CAF50', /* Green */
-        border: 'none',
-        color: 'white',
-        padding: '20px 40px', // Increased padding to make the button bigger
-        textAlign: 'center',
-        textDecoration: 'none',
-        display: 'inline-block',
-        fontSize: '20px', // Increased font size to make the button bigger
-        margin: '4px 2px',
-        cursor: 'pointer'
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row", // Change to "row"
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
       }}>
-            Congrat
-        </button>
+      <button
+        type="button"
+        className="btn btn-outline-primary"
+        style={{
+          fontSize: "50px",
+          padding: "10px 20px",
+          marginRight: "400px", // Add some space between the button and the image
+        }}>
+        Congratulate
+      </button>
+      <img
+        src={robotIMG}
+        alt="My Graphic"
+        style={{ width: "400px", height: "600px" }} // Increase width and height
+      />
     </div>
- );
+  );
 }
 
 export default Button;
