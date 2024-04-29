@@ -2,7 +2,7 @@ import ListGroup from "./components/ListGroup";
 import {ButtonContainer, CarmenImg} from "./components/Button";
 
 /**
- * Container with button and CARMEN image
+ * Container with buttons and CARMEN image
  */
 function App() {
   return (

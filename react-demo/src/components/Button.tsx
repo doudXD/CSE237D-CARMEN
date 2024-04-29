@@ -2,8 +2,9 @@ import robotIMG from "../robot.png";
 import {useState} from 'react';
 
 /**
- * Button component (Congratulations)
- * When clicked, prints to console from a cycle of phrases.
+ * Button Component
+ * @param name: Title displayed on button
+ * @param onButtonClick: function called when button is clicked 
  */
 function Button({name, onButtonClick}) {
 
@@ -22,22 +23,27 @@ function Button({name, onButtonClick}) {
   );
 }
 
+/**
+ * FlexBox containing buttons
+ */
 export function ButtonContainer() {
-  var iCongrats = 0;
+  // holds state of congrats phrase cycle
+  const [congratsState, setCongrats] = useState(0);
 
+  // When button clicked, prints to console from a cycle of phrases.
   function handleCongratsClick(){
-    switch(iCongrats){
+    switch(congratsState){
       case(0):
         console.log('Congrats!\n;)');
-        iCongrats++;
+        setCongrats(1);
         break;
       case(1):
         console.log('That was great!\n:)');
-        iCongrats++;
+        setCongrats(2);
         break;
       case(2):
         console.log('Way to go!');
-        iCongrats=0;
+        setCongrats(0);
         break;
       default:
         console.log('Hey there! This is the default statement. Are you sure you\'re suppose to see me?');
