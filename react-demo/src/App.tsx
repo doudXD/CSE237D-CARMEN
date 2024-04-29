@@ -1,5 +1,5 @@
 import ListGroup from "./components/ListGroup";
-import {Button, CarmenImg} from "./components/Button";
+import {ButtonContainer, CarmenImg} from "./components/Button";
 
 /**
  * Container with button and CARMEN image
@@ -14,7 +14,7 @@ function App() {
         alignItems: "center",
         height: "100vh",
       }}>
-      <Button />
+      <ButtonContainer />
       <CarmenImg />
     </div>
   );
