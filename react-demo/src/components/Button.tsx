@@ -1,31 +1,56 @@
 import robotIMG from "../robot.png";
-function Button() {
+
+/**
+ * Button component (Congratulations)
+ * When clicked, prints to console from a cycle of phrases.
+ */
+export function Button() {
+
+  var i = 0;
+
+  function handleClick() {
+    switch(i){
+      case(0):
+        console.log('Congrats!\n;)');
+        i++;
+        break;
+      case(1):
+        console.log('That was great!\n:)');
+        i++;
+        break;
+      case(2):
+        console.log('Way to go!');
+        i=0;
+        break;
+      default:
+        console.log('Hey there! This is the default statement. Are you sure you\'re suppose to see me?');
+    }
+  }
+
   return (
-    <div
+    <button
+      type="button"
+      className="btn btn-outline-primary"
+      onClick={handleClick}
       style={{
-        display: "flex",
-        flexDirection: "row", // Change to "row"
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
+        fontSize: "50px",
+        padding: "10px 20px",
+        marginRight: "20%", // Add some space between the button and the image
       }}>
-      <button
-        type="button"
-        className="btn btn-outline-primary"
-        style={{
-          fontSize: "50px",
-          padding: "10px 20px",
-          marginRight: "400px", // Add some space between the button and the image
-        }}>
-        Congratulate
-      </button>
-      <img
-        src={robotIMG}
-        alt="My Graphic"
-        style={{ width: "400px", height: "600px" }} // Increase width and height
-      />
-    </div>
+      Congratulate
+    </button>
   );
 }
 
-export default Button;
+/**
+ * CARMEN img
+ */
+export function CarmenImg() {
+  return (
+    <img
+      src={robotIMG}
+      alt="My Graphic"
+      style={{ width: "20%"}}
+    />
+  );
+}
