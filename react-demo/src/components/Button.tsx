@@ -1,5 +1,6 @@
 import robotIMG from "../robot.png";
 import {useState} from 'react';
+import { ReadyState } from 'react-use-websocket';
 
 /**
  * Button Component
@@ -25,10 +26,20 @@ function Button({name, onButtonClick}) {
 
 /**
  * FlexBox containing buttons
+ * @param readyState: state of websocket connection
+ * @param sendMessage: function used to send message via websocket
  */
-export function ButtonContainer() {
+export function ButtonContainer({readyState, sendMessage}) {
   // holds state of congrats phrase cycle
   const [congratsState, setCongrats] = useState(0);
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState];
 
   // When button clicked, prints to console from a cycle of phrases.
   function handleCongratsClick(){
@@ -49,18 +60,42 @@ export function ButtonContainer() {
         console.log('Hey there! This is the default statement. Are you sure you\'re suppose to see me?');
     }
   }
+  function handleCongratsClickWebsocket(){
+    if(readyState === ReadyState.OPEN){
+      switch(congratsState){
+        case(0):
+          sendMessage('Congrats!\n;)');
+          setCongrats(1);
+          break;
+        case(1):
+          sendMessage('That was great!\n:)');
+          setCongrats(2);
+          break;
+        case(2):
+          sendMessage('Way to go!');
+          setCongrats(0);
+          break;
+        default:
+          sendMessage('Hey there! This is the default statement. Are you sure you\'re suppose to see me?');
+      }
+    }
+    else{
+      console.log('seems the connection isn\'t open yet');
+    }
+  }
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "column", // Change to "row"
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         marginRight: "20%",
         gap: "25px",
       }}>
       <Button name="Congratulate" onButtonClick={handleCongratsClick}/>
-      <Button name="Congratulate2" onButtonClick={handleCongratsClick}/>
+      <Button name="Congratulate(Websocket Edition)" onButtonClick={handleCongratsClickWebsocket}/>
+      <label>{connectionStatus}</label>
     </div>
 
   );

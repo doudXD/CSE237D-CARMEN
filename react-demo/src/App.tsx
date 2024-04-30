@@ -1,10 +1,18 @@
 import ListGroup from "./components/ListGroup";
 import {ButtonContainer, CarmenImg} from "./components/Button";
+import {useState} from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 /**
  * Container with buttons and CARMEN image
  */
 function App() {
+
+  const [socketUrl, setSocketUrl] = useState('ws://127.0.0.1:800/');
+  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
+
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+
   return (
     <div
       style={{
@@ -14,7 +22,7 @@ function App() {
         alignItems: "center",
         height: "100vh",
       }}>
-      <ButtonContainer />
+      <ButtonContainer readyState={readyState} sendMessage={sendMessage} />
       <CarmenImg />
     </div>
   );
