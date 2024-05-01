@@ -8,7 +8,7 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
  */
 function App() {
 
-  const [socketUrl, setSocketUrl] = useState('ws://127.0.0.1:800/');
+  const [socketUrl, setSocketUrl] = useState('ws://127.0.0.1:8000');
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
