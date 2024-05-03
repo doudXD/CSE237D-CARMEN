@@ -10,7 +10,7 @@ import TextBox from "./components/TextBox";
  */
 function App() {
 
-  const [socketUrl, setSocketUrl] = useState('ws://192.168.1.24:8000');
+  const [socketUrl, setSocketUrl] = useState('ws://192.168.180.53:8000');
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
@@ -21,7 +21,7 @@ function App() {
         display: "flex",
         flexDirection: "column", // Change to "row"
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "left",
         height: "100vh",
       }}>
       <div style={{ 
@@ -34,7 +34,7 @@ function App() {
         <ButtonContainer readyState={readyState} sendMessage={sendMessage} />
         <CarmenImg />
       </div>
-      <TextBox readyState={readyState} sendMessage={sendMessage}/>
+      <TextBox />
     </div>
   );
 }
