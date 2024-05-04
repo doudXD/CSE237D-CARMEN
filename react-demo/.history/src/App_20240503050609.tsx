@@ -10,7 +10,7 @@ import TextBox from "./components/TextBox";
  */
 function App() {
 
-  const [socketUrl, setSocketUrl] = useState('ws://192.168.1.24:8000');
+  const [socketUrl, setSocketUrl] = useState('ws://127.0.0.1:8000');
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
@@ -34,7 +34,7 @@ function App() {
         <ButtonContainer readyState={readyState} sendMessage={sendMessage} />
         <CarmenImg />
       </div>
-      <TextBox readyState={readyState} sendMessage={sendMessage}/>
+      <TextBox />
     </div>
   );
 }
