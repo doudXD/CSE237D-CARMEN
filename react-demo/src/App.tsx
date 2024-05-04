@@ -5,13 +5,13 @@ import useWebSocket from "react-use-websocket";
 // import TextBox from "./components/TextBox";
 
 const LOCAL_URL = "ws://127.0.0.1:800";
-const BOT_URL = "ws://192.168.1.24:8000";
+const BOT_URL = "ws://100.84.29.19:5000";
 
 /**
  * Container with buttons and CARMEN image
  */
 function App() {
-  const [socketUrl, setSocketUrl] = useState(LOCAL_URL);
+  const [socketUrl, setSocketUrl] = useState(BOT_URL);
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
@@ -26,11 +26,9 @@ function App() {
         marginBottom: "100px",
         justifyContent: "center",
         alignItems: "center",
+        marginTop: "200px",
       }}>
-      <CongratsButtonContainer
-        readyState={readyState}
-        sendMessage={sendMessage}
-      />
+      <ButtonContainer readyState={readyState} sendMessage={sendMessage} />
       <CarmenImg />
     </div>
   );
