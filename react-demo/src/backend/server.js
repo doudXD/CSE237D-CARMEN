@@ -5,7 +5,7 @@ import http from 'http';
 // Create an HTTP server and a WebSocket server
 const server = http.createServer();
 const wsServer = new WebSocketServer({ server });
-const port = 8000;
+const port = 800;
 
 // Start the WebSocket server
 server.listen(port, () => {
