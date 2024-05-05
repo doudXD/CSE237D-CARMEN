@@ -13,7 +13,6 @@ function ButtonContainer({
   readyState: ReadyState;
   sendMessage: (message: string) => void;
 }) {
-
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
     [ReadyState.OPEN]: "Open",
@@ -37,10 +36,13 @@ function ButtonContainer({
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        marginRight: "20%",
-        gap: "25px",
+        marginRight: "10%",
+        gap: "20px",
       }}>
-      <Button name="Congratulate" onButtonClick={() => (handleCongratsClick(readyState, sendMessage))} />
+      <Button
+        name="Congratulate"
+        onButtonClick={() => handleCongratsClick(readyState, sendMessage)}
+      />
       <label>{connectionStatus}</label>
     </div>
   );
@@ -49,7 +51,10 @@ function ButtonContainer({
 function handleCongratsClick(readyState, sendMessage) {
   if (readyState === ReadyState.OPEN) {
     console.log("sending message");
-    sendMessage("Congrats");
+    sendMessage({
+      prompt: "Congrats",
+      animation: "nod",
+    });
   } else {
     console.log("seems the connection isn't open yet");
   }

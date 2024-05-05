@@ -14,7 +14,8 @@ function App() {
   const [socketUrl, setSocketUrl] = useState(BOT_URL);
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+  const { sendJsonMessage, lastJsonMessage, readyState } =
+    useWebSocket(socketUrl);
   //print readyState
   console.log(readyState);
   return (
@@ -28,7 +29,7 @@ function App() {
         alignItems: "center",
         marginTop: "200px",
       }}>
-      <ButtonContainer readyState={readyState} sendMessage={sendMessage} />
+      <ButtonContainer readyState={readyState} sendMessage={sendJsonMessage} />
       <CarmenImg />
     </div>
   );
