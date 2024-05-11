@@ -37,7 +37,7 @@ function PromptOptions ({
                 />
             </div>
             <div className="ButtonContainerRow">
-                <TextBox setPrompt={setPrompt}/>
+                <TextBox setPrompt={setPrompt} promptState={promptState}/>
             </div>
         </div>
     )

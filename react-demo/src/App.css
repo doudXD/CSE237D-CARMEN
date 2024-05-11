@@ -21,8 +21,9 @@ div.ButtonContainerRow {
 }
 
 button.currBtn{
-    background-color: royalblue;
-    color: whitesmoke;
+    /*not sure what other colors we were using so I just grabbed a color in a similar area*/
+    background-color: rgb(47, 98, 252);
+    color: white;
 }
 
 button.PromptButton{

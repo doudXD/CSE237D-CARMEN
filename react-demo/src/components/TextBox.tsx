@@ -1,20 +1,40 @@
 import { useState } from 'react';
-import { ReadyState } from 'react-use-websocket';
 
-function TextBox({  setPrompt }) {
-  // State to hold the textbox value
+/**
+ * TextBox for custom Instructions
+ * 
+ * When input in textbox is entered, prompt value is set to value in textbox
+ * 
+ * @param setPrompt: function called to update prompt value
+ * @param promptState: string containing current prompt value
+ */
+function TextBox({
+    setPrompt,
+    promptState
+  }: {
+    setPrompt: (message: string) => void;
+    promptState: string;
+  }) {
+    
+    // State to hold the textbox value
     const [textValue, setTextValue] = useState('');
 
-  // Function to handle textbox changes
-    const handleTextChange = (event) => {
-    setTextValue(event.target.value);
+
+    // Update prompt when enter pressed and clear textbox
+    function handleInput(event){
+        if (event.key === "Enter"){
+            if (textValue.trim() !== '') {
+                setPrompt(textValue);
+                setTextValue('');
+            }
+        }
     };
 
-    const handleSendMessage = () => {
-        if (textValue.trim() !== '') {
-            setPrompt(textValue);
-            setTextValue('');
-    }}
+    // Function to handle textbox changes
+    function handleTextChange(event){
+        setTextValue(event.target.value);
+    };
+
 
     return (
     <div>
@@ -32,14 +52,14 @@ function TextBox({  setPrompt }) {
         placeholder="Enter Text Here"
         value={textValue}
         onChange={handleTextChange}
+        onKeyUp={handleInput}
         style={{
             width: '300px', // Adjust width as needed
             height: '75px', // Adjust height as needed
             fontSize: '16px', // Adjust font size as needed
         }}
         />
-        <p>You typed: {textValue}</p>
-        <button onClick={handleSendMessage}>Send Message</button>
+        <p>Current Prompt: {promptState}</p>
     </div>
     );
 }
