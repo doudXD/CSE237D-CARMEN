@@ -6,17 +6,19 @@
 function Button({
   name,
   onButtonClick,
+  className="",
 }: {
   name: string;
   onButtonClick: () => void;
+  className: string;
 }) {
   return (
     <button
       type="button"
-      className="btn btn-outline-primary"
+      className={`${className} btn btn-outline-primary`}
       onClick={onButtonClick}
       style={{
-        fontSize: "50px",
+        fontSize: "35px",
         padding: "10px 20px",
         //marginRight: "20%", // Add some space between the button and the image
       }}>

@@ -3,6 +3,8 @@
  */
 import robotIMG from "../robot.png";
 
-export function CarmenImg() {
+function CarmenImg() {
   return <img src={robotIMG} alt="My Graphic" style={{marginLeft: "2%", marginTop: "1%", width: "5%" }} />;
 }
+
+export { CarmenImg };

@@ -1,30 +1,28 @@
-import { ButtonContainer } from "./containers/ButtonContainer";
-import { PromptOptions } from "./containers/PromptOptions";
-import { BehaviorOptions } from "./containers/BehaviorOptions";
-import { Button } from "./components/Button";
-import { CarmenImg } from "./components/CarmenImg";
 import { useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { ReadyState } from "react-use-websocket"; // Import the ReadyState type
 
+//Import Custom Components
+import { PromptOptions } from "./containers/PromptOptions";
+import { AnimationOptions } from "./containers/AnimationOptions";
+import { Button } from "./components/Button";
+import { CarmenImg } from "./components/CarmenImg";
+
+//URLs for mock server and bot connection
 const LOCAL_URL = "ws://127.0.0.1:800";
 const BOT_URL = "ws://100.84.29.19:5000";
 
 /**
- * Container with buttons and CARMEN image
+ * Base Container of Web App
  */
 function App() {
-  const [socketUrl, setSocketUrl] = useState(LOCAL_URL);
+  //setup websocket values
+  const [socketUrl, setSocketUrl] = useState(BOT_URL);
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
-  const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket(socketUrl);
-  //print readyState
-  // console.log(readyState);
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl);
 
-  const [promptState, setPrompt] = useState("");
-  const [animationState, setAnimation] = useState("");
-
+  //Translate readyState meaning
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
     [ReadyState.OPEN]: "Open",
@@ -33,8 +31,14 @@ function App() {
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
+  //Setup state of prompt and animation values
+  const [promptState, setPrompt] = useState("");
+  const [animationState, setAnimation] = useState("");
+
+  // Header containing CARMEN img and current connection status
+  // Left half will display activites
+  // Right half contains box with prompts, box with behaviors, and send button stacked 
   return (
-    // img
     <div>
       <header>
           <CarmenImg />
@@ -56,7 +60,9 @@ function App() {
             padding: "0% 5%",
             gap: "15px"
           }}>
-          <label>Displayed Activities</label>
+          <label style = {{
+            fontSize: "35px"
+          }}>Under Construction: Displayed Activities</label>
         </div>   
         <div
           style={{
@@ -70,11 +76,13 @@ function App() {
             padding: "0% 5%",
             gap: "15px"
           }}>
-          <PromptOptions setPrompt={setPrompt} />
-          <BehaviorOptions setAnimation={setAnimation} />
+          <PromptOptions setPrompt={setPrompt} promptState={promptState} />
+          <AnimationOptions setAnimation={setAnimation} animationState={animationState} />
           <Button 
+            className=""
             name="Send" 
             onButtonClick={() => { 
+              //send JSON with prompt and animation and reset respective states
               console.log("sending");
               console.log(promptState);
               console.log(animationState);

@@ -1,4 +1,4 @@
-.ButtonContainer {
+div.ButtonContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -9,7 +9,7 @@
     border: 5px outset black;
 }
 
-.ButtonContainerRow {
+div.ButtonContainerRow {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -18,4 +18,17 @@
     /* margin-right: "10%"; */
     gap: 20px;
     /* border: 5px outset black; */
+}
+
+button.currBtn{
+    background-color: royalblue;
+    color: whitesmoke;
+}
+
+button.PromptButton{
+    width: 240px;
+}
+
+button.AnimationButton{
+    width: 140px;
 }
