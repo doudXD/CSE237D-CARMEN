@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ReadyState } from 'react-use-websocket';
 
-function TextBox({  sendMessage, readyState }) {
+function TextBox({  setPrompt }) {
   // State to hold the textbox value
     const [textValue, setTextValue] = useState('');
 
@@ -11,13 +11,9 @@ function TextBox({  sendMessage, readyState }) {
     };
 
     const handleSendMessage = () => {
-        if (readyState == ReadyState.OPEN) {
-            if (textValue.trim() !== '') {
-                sendMessage(textValue);
-                setTextValue('');
-        } else {
-            console.log("WebSocket connection is not open.");
-        }
+        if (textValue.trim() !== '') {
+            setPrompt(textValue);
+            setTextValue('');
     }}
 
     return (
@@ -48,4 +44,4 @@ function TextBox({  sendMessage, readyState }) {
     );
 }
 
-export default TextBox;
+export { TextBox };
