@@ -15,7 +15,7 @@ const Navbar = () => {
         CARMEN-APP
       </h1>
       <div className="menu">
-        <Link to="/login" className="link">
+        <Link to="/" className="link">
           Login
         </Link>
         <Link to="/app" className="link">

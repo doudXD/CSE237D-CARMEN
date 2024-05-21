@@ -12,8 +12,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Login />} />
         <Route path="/app" element={<App />} />
+        <Route path="/" element={<Login />} />
       </Routes>
     </Router>
   </React.StrictMode>

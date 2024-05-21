@@ -1,45 +1,64 @@
 import React, { useState } from "react";
-const Login = () => {
-  const [username, setUsername] = useState("");
+import { useNavigate } from "react-router-dom";
+import "./Login.css";
+
+const Login = (props) => {
+  const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [url, setUrl] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const navigate = useNavigate();
 
-    // Basic validation
-    if (!username || !password) {
-      setError("Username and password are required");
-      return;
-    }
-
-    // TODO: Implement your login logic here
-    console.log(`Logging in username: ${username} and password: ${password}`);
+  const onButtonClick = () => {
+    // You'll update this function later...
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        {error && <p>{error}</p>}
-        <button type="submit">Login</button>
-      </form>
+    <div className={"mainContainer"}>
+      <div className={"titleContainer"}>
+        <div>HELLO FROM CARMEN!</div>
+      </div>
+      <br />
+      <div className={"inputContainer"}>
+        <input
+          value={username}
+          placeholder="Enter your username"
+          onChange={(ev) => setEmail(ev.target.value)}
+          className={"inputBox"}
+        />
+        <label className="errorLabel">{nameError}</label>
+      </div>
+      <br />
+      <div className={"inputContainer"}>
+        <input
+          value={password}
+          placeholder="Enter your password"
+          onChange={(ev) => setPassword(ev.target.value)}
+          className={"inputBox"}
+        />
+        <label className="errorLabel">{passwordError}</label>
+      </div>
+      <br />
+      <div className={"inputContainer"}>
+        <input
+          value={url}
+          placeholder="Enter your CARMEN Robot to connect"
+          onChange={(ev) => setUrl(ev.target.value)}
+          className={"inputBox"}
+        />
+        <label className="errorLabel">{passwordError}</label>
+      </div>
+      <br />
+      <div className={"inputContainer"}>
+        <input
+          className={"inputButton"}
+          type="button"
+          onClick={onButtonClick}
+          value={"Connect to CARMEN"}
+        />
+      </div>
     </div>
   );
 };
