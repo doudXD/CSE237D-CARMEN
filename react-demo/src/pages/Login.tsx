@@ -1,18 +1,59 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 const Login = (props) => {
-  const [username, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [url, setUrl] = useState("");
   const [nameError, setNameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [urlError, setUrlError] = useState("");
 
   const navigate = useNavigate();
 
   const onButtonClick = () => {
-    // You'll update this function later...
+    if (username === "") {
+      setNameError("Please enter a username");
+    } else {
+      setNameError("");
+    }
+
+    if (password === "") {
+      setPasswordError("Please enter a password");
+    } else {
+      setPasswordError("");
+    }
+
+    if (url === "") {
+      setUrlError("Please enter a URL");
+    } else {
+      setUrlError("");
+    }
+
+    if (username !== "" && password !== "" && url !== "") {
+      fetch(url + "/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      })
+        .catch((error) => console.error("Error:", error))
+        .then((r) => r.json())
+        .then((r) => {
+          if ("success" === r.message) {
+            localStorage.setItem(
+              "user",
+              JSON.stringify({ username, token: r.token })
+            );
+            props.setLoggedIn(true);
+            navigate("/app");
+          } else {
+            window.alert("Wrong email or password");
+          }
+        });
+    }
   };
 
   return (
@@ -25,7 +66,7 @@ const Login = (props) => {
         <input
           value={username}
           placeholder="Enter your username"
-          onChange={(ev) => setEmail(ev.target.value)}
+          onChange={(ev) => setUsername(ev.target.value)}
           className={"inputBox"}
         />
         <label className="errorLabel">{nameError}</label>
@@ -48,7 +89,7 @@ const Login = (props) => {
           onChange={(ev) => setUrl(ev.target.value)}
           className={"inputBox"}
         />
-        <label className="errorLabel">{passwordError}</label>
+        <label className="errorLabel">{urlError}</label>
       </div>
       <br />
       <div className={"inputContainer"}>
