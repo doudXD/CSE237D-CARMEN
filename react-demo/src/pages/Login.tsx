@@ -48,7 +48,7 @@ const Login = (props) => {
               JSON.stringify({ username, token: r.token })
             );
             props.setLoggedIn(true);
-            navigate("/app");
+            navigate("/app", { state: { roboturl: url, token: r.token } });
           } else {
             window.alert("Wrong email or password");
           }
