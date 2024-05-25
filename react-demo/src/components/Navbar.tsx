@@ -2,7 +2,11 @@ import { Link } from "react-router-dom";
 import robotImg from "../robot.png";
 import "./Navbar.css";
 
-const Navbar = () => {
+interface NavbarProps {
+  loggedIn: boolean;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ loggedIn }) => {
   return (
     <nav className="Navbar">
       <h1 className="title">
@@ -15,15 +19,23 @@ const Navbar = () => {
         CARMEN-APP
       </h1>
       <div className="menu">
-        <Link to="/" className="link">
-          Login
-        </Link>
-        <Link to="/app" className="link">
-          App
-        </Link>
-        <Link to="/login" className="link">
-          History
-        </Link>
+        {loggedIn ? (
+          <>
+            <Link to="/logout" className="link">
+              Logout
+            </Link>
+            <Link to="/app" className="link">
+              App
+            </Link>
+            <Link to="/history" className="link">
+              History
+            </Link>
+          </>
+        ) : (
+          <Link to="/" className="link">
+            Login
+          </Link>
+        )}
       </div>
     </nav>
   );
