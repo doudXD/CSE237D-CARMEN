@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useWebSocket from "react-use-websocket";
+import { ReadyState } from "react-use-websocket";
 import "./Login.css";
 
 const Login = (props) => {
@@ -11,6 +13,30 @@ const Login = (props) => {
   const [urlError, setUrlError] = useState("");
 
   const navigate = useNavigate();
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(url);
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  }[readyState];
+
+  useEffect(() => {
+    if (lastJsonMessage) {
+      console.log(lastJsonMessage);
+
+      if (lastJsonMessage.status === "success") {
+        props.setLoggedIn(true);
+        navigate("/app", {
+          state: { roboturl: url, token: lastJsonMessage.token },
+        });
+      } else {
+        window.alert("Wrong email or password");
+      }
+    }
+  }, [lastJsonMessage]);
 
   const onButtonClick = () => {
     if (username === "") {
@@ -32,27 +58,40 @@ const Login = (props) => {
     }
 
     if (username !== "" && password !== "" && url !== "") {
-      fetch(url + "/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      })
-        .catch((error) => console.error("Error:", error))
-        .then((r) => r.json())
-        .then((r) => {
-          if ("success" === r.message) {
-            localStorage.setItem(
-              "user",
-              JSON.stringify({ username, token: r.token })
-            );
-            props.setLoggedIn(true);
-            navigate("/app", { state: { roboturl: url, token: r.token } });
-          } else {
-            window.alert("Wrong email or password");
-          }
-        });
+      console.log("sending");
+      console.log(username);
+      console.log(password);
+      sendJsonMessage({
+        type: "auth",
+        username: username,
+        password: password,
+      });
+
+      if (lastJsonMessage) {
+        console.log("lastJsonMessage");
+        console.log(lastJsonMessage);
+      }
+      // fetch(url + "/auth", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ username, password }),
+      // })
+      //   .catch((error) => console.error("Error:", error))
+      //   .then((r) => r.json())
+      //   .then((r) => {
+      //     if ("success" === r.message) {
+      //       localStorage.setItem(
+      //         "user",
+      //         JSON.stringify({ username, token: r.token })
+      //       );
+      //       props.setLoggedIn(true);
+      //       navigate("/app", { state: { roboturl: url, token: r.token } });
+      //     } else {
+      //       window.alert("Wrong email or password");
+      //     }
+      //   });
     }
   };
 
