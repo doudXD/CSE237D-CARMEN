@@ -1,5 +1,6 @@
 import { useState } from "react";
-
+import useWebSocket from "react-use-websocket";
+import { ReadyState } from "react-use-websocket";
 //Import Custom Components
 import { PromptOptions } from "../containers/PromptOptions";
 import { AnimationOptions } from "../containers/AnimationOptions";
@@ -7,7 +8,7 @@ import { Button } from "../components/Button";
 import { useLocation } from "react-router-dom";
 
 interface LocationState {
-  roboturl: string;
+  socketUrl: string;
   token: string;
 }
 import "./App.css";
@@ -21,12 +22,26 @@ function App() {
 
   //Get URL and token from previous page
   const location = useLocation();
-  const { roboturl = "ws://100.84.29.19:5000", token } =
+  const { socketUrl = "ws://127.0.0.1:800", token } =
     (location.state as LocationState) || {};
 
   //Setup state of prompt and animation values
   const [promptState, setPrompt] = useState("");
   const [animationState, setAnimation] = useState("");
+
+  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
+
+  const { sendJsonMessage, lastJsonMessage, readyState } =
+    useWebSocket(socketUrl);
+
+  //Translate readyState meaning
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  }[readyState];
 
   // Header containing CARMEN img and current connection status
   // Left half will display activites
@@ -81,24 +96,25 @@ function App() {
               console.log("sending");
               console.log(promptState);
               console.log(animationState);
-              // sendJsonMessage({
-              //   prompt: { promptState },
-              //   animation: { animationState },
-              // });
-              console.log(roboturl + "/interrupt");
-              fetch(roboturl + "/interrupt", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  prompt: { promptState },
-                  animation: { animationState },
-                }),
-              }).catch((error) => {
-                console.error("Error:", error);
+              sendJsonMessage({
+                type: "interrupt",
+                prompt: { promptState },
+                animation: { animationState },
               });
+              // console.log(roboturl + "/interrupt");
+              // fetch(roboturl + "/interrupt", {
+              //   method: "POST",
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //     Authorization: `Bearer ${token}`,
+              //   },
+              //   body: JSON.stringify({
+              //     prompt: { promptState },
+              //     animation: { animationState },
+              //   }),
+              // }).catch((error) => {
+              //   console.error("Error:", error);
+              // });
               setPrompt("");
               setAnimation("");
             }}

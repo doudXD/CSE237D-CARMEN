@@ -30,7 +30,7 @@ const Login = (props) => {
       if (lastJsonMessage.status === "success") {
         props.setLoggedIn(true);
         navigate("/app", {
-          state: { roboturl: url, token: lastJsonMessage.token },
+          state: { socketUrl: url, token: lastJsonMessage.token },
         });
       } else {
         window.alert("Wrong email or password");
