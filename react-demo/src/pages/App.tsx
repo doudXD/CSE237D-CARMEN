@@ -1,24 +1,35 @@
 import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
-import { ReadyState } from "react-use-websocket"; // Import the ReadyState type
-
+import { ReadyState } from "react-use-websocket";
 //Import Custom Components
 import { PromptOptions } from "../containers/PromptOptions";
 import { AnimationOptions } from "../containers/AnimationOptions";
 import { Button } from "../components/Button";
-import { CarmenImg } from "../components/CarmenImg";
+import { useLocation } from "react-router-dom";
 
-//URLs for mock server and bot connection
-const LOCAL_URL = "ws://127.0.0.1:800";
-const BOT_URL =  "ws://100.84.26.84:5000";
-                      
+interface LocationState {
+  socketUrl: string;
+  token: string;
+}
+
 import "./App.css";
 /**
  * Base Container of Web App
  */
 function App() {
-  //setup websocket values
-  const [socketUrl, setSocketUrl] = useState(BOT_URL);
+  // URLs for mock server and bot connection
+  // const LOCAL_URL = "ws://127.0.0.1:800";
+  // const BOT_URL = "ws://100.84.29.19:5000";
+
+  //Get URL and token from previous page
+  const location = useLocation();
+  const { socketUrl = "ws://127.0.0.1:800", token } =
+    (location.state as LocationState) || {};
+
+  //Setup state of prompt and animation values
+  const [promptState, setPrompt] = useState("");
+  const [animationState, setAnimation] = useState("");
+
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendJsonMessage, lastJsonMessage, readyState } =
@@ -37,6 +48,7 @@ function App() {
     [ReadyState.CLOSED]: "Closed",
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
+
 
   //Setup state of prompt and animation values
   const [promptState, setPrompt] = useState("");
@@ -61,10 +73,6 @@ function App() {
   // Right half contains box with prompts, box with behaviors, and send button stacked
   return (
     <div>
-      {/* <header>
-        <CarmenImg />
-        <label>{connectionStatus}</label>
-      </header> */}
       <div
         style={{
           display: "flex",
@@ -175,9 +183,25 @@ function App() {
               console.log(promptState);
               console.log(animationState);
               sendJsonMessage({
+                type: "interrupt",
                 prompt: { promptState },
                 animation: { animationState },
+                token: token,
               });
+              // console.log(roboturl + "/interrupt");
+              // fetch(roboturl + "/interrupt", {
+              //   method: "POST",
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //     Authorization: `Bearer ${token}`,
+              //   },
+              //   body: JSON.stringify({
+              //     prompt: { promptState },
+              //     animation: { animationState },
+              //   }),
+              // }).catch((error) => {
+              //   console.error("Error:", error);
+              // });
               setPrompt("");
               setAnimation("");
             }}

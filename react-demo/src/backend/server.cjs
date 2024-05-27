@@ -1,5 +1,4 @@
 const express = require('express')
-const bcrypt = require('bcrypt')
 var cors = require('cors')
 const jwt = require('jsonwebtoken')
 var low = require('lowdb')
@@ -21,7 +20,33 @@ app.use(express.urlencoded({ extended: true }))
 // Basic home route for the API
 app.get('/', (_req, res) => {
   res.send('Auth API.\nPlease use POST /auth for authentication')
+  res.send('Interrupt API.\nPlease use POST /interrupt for interrupt')
 })
+
+
+app.post('/interrupt', (req, res) => {
+  // const { prompt, animation } = req.body;
+  const authHeader = req.headers.authorization;
+
+  if (authHeader) {
+    const token = authHeader.split(' ')[1]; // Bearer <token>
+
+     jwt.verify(token, jwtSecretKey, (err, user) => {
+      if (err) {
+        return res.sendStatus(403); // Forbidden
+      }
+
+      req.user = user;
+    });
+
+  } else {
+    return res.sendStatus(401); // Unauthorized
+  }
+
+  console.log('Interrupt request');
+  console.log(req.body);
+  res.status(200).json({ message: 'success' });
+});
 
 // The auth endpoint logs a user based on an existing record
 app.post('/auth', (req, res) => {
