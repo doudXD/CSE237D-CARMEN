@@ -1,44 +1,28 @@
 import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
-import { ReadyState } from "react-use-websocket";
+import { ReadyState } from "react-use-websocket"; // Import the ReadyState type
+
 //Import Custom Components
 import { PromptOptions } from "../containers/PromptOptions";
 import { AnimationOptions } from "../containers/AnimationOptions";
 import { Button } from "../components/Button";
-import { useLocation } from "react-router-dom";
+import { CarmenImg } from "../components/CarmenImg";
 
-interface LocationState {
-  socketUrl: string;
-  token: string;
-}
-
+//URLs for mock server and bot connection
+const LOCAL_URL = "ws://127.0.0.1:800";
+const BOT_URL =  "ws://100.84.26.84:5000";
+                      
 import "./App.css";
 /**
  * Base Container of Web App
  */
 function App() {
-  // URLs for mock server and bot connection
-  // const LOCAL_URL = "ws://127.0.0.1:800";
-  // const BOT_URL = "ws://100.84.29.19:5000";
-
-  //Get URL and token from previous page
-  const location = useLocation();
-  const { socketUrl = "ws://127.0.0.1:800", token } =
-    (location.state as LocationState) || {};
-
-  //Setup state of prompt and animation values
-  const [promptState, setPrompt] = useState("");
-  const [animationState, setAnimation] = useState("");
-
+  //setup websocket values
+  const [socketUrl, setSocketUrl] = useState(BOT_URL);
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket(socketUrl, {heartbeat: {
-      message: 'PING',
-      returnMessage: "PONG",
-      timeout: 60000,
-      interval: 10000,
-    }} );
+    useWebSocket(socketUrl);
 
   //Translate readyState meaning
   const connectionStatus = {
@@ -48,7 +32,6 @@ function App() {
     [ReadyState.CLOSED]: "Closed",
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
-
 
   //Setup state of prompt and animation values
   const [promptState, setPrompt] = useState("");
@@ -73,6 +56,10 @@ function App() {
   // Right half contains box with prompts, box with behaviors, and send button stacked
   return (
     <div>
+      {/* <header>
+        <CarmenImg />
+        <label>{connectionStatus}</label>
+      </header> */}
       <div
         style={{
           display: "flex",
@@ -124,7 +111,6 @@ function App() {
                       <Button
                         key="Animation"
                         name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
-                        className={isCurrBehavior}
                         onButtonClick={() => {
                         }}
                       />
@@ -135,7 +121,6 @@ function App() {
                           <Button
                         key="function"
                         name={`Action: ${JSON.stringify(messageValue.function)}`}
-                        className={isCurrBehavior}
                         onButtonClick={() => {
                         }}
                       />
@@ -145,7 +130,6 @@ function App() {
                           <Button
                             key={key}
                             name={`${key}: ${JSON.stringify(value)}`}
-                            className={isCurrBehavior}
                             onButtonClick={() => {
                             }}
                             />
@@ -183,25 +167,9 @@ function App() {
               console.log(promptState);
               console.log(animationState);
               sendJsonMessage({
-                type: "interrupt",
                 prompt: { promptState },
                 animation: { animationState },
-                token: token,
               });
-              // console.log(roboturl + "/interrupt");
-              // fetch(roboturl + "/interrupt", {
-              //   method: "POST",
-              //   headers: {
-              //     "Content-Type": "application/json",
-              //     Authorization: `Bearer ${token}`,
-              //   },
-              //   body: JSON.stringify({
-              //     prompt: { promptState },
-              //     animation: { animationState },
-              //   }),
-              // }).catch((error) => {
-              //   console.error("Error:", error);
-              // });
               setPrompt("");
               setAnimation("");
             }}

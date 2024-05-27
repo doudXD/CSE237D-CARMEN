@@ -1,44 +1,28 @@
 import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
-import { ReadyState } from "react-use-websocket";
+import { ReadyState } from "react-use-websocket"; // Import the ReadyState type
+
 //Import Custom Components
 import { PromptOptions } from "../containers/PromptOptions";
 import { AnimationOptions } from "../containers/AnimationOptions";
 import { Button } from "../components/Button";
-import { useLocation } from "react-router-dom";
+import { CarmenImg } from "../components/CarmenImg";
 
-interface LocationState {
-  socketUrl: string;
-  token: string;
-}
-
+//URLs for mock server and bot connection
+const LOCAL_URL = "ws://127.0.0.1:800";
+const BOT_URL =  "ws://100.84.26.84:5000";
+                      
 import "./App.css";
 /**
  * Base Container of Web App
  */
 function App() {
-  // URLs for mock server and bot connection
-  // const LOCAL_URL = "ws://127.0.0.1:800";
-  // const BOT_URL = "ws://100.84.29.19:5000";
-
-  //Get URL and token from previous page
-  const location = useLocation();
-  const { socketUrl = "ws://127.0.0.1:800", token } =
-    (location.state as LocationState) || {};
-
-  //Setup state of prompt and animation values
-  const [promptState, setPrompt] = useState("");
-  const [animationState, setAnimation] = useState("");
-
+  //setup websocket values
+  const [socketUrl, setSocketUrl] = useState(BOT_URL);
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket(socketUrl, {heartbeat: {
-      message: 'PING',
-      returnMessage: "PONG",
-      timeout: 60000,
-      interval: 10000,
-    }} );
+    useWebSocket(socketUrl);
 
   //Translate readyState meaning
   const connectionStatus = {
@@ -48,7 +32,6 @@ function App() {
     [ReadyState.CLOSED]: "Closed",
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
-
 
   //Setup state of prompt and animation values
   const [promptState, setPrompt] = useState("");
@@ -66,6 +49,11 @@ function App() {
 
   console.log("json message history: " + JSON.stringify(messageHistory));
 
+  // const lastMessage = messageHistory.length > 0 ? messageHistory[messageHistory.length - 1] : null;
+
+  // console.log("last message: " + JSON.stringify(lastMessage));
+  // console.log("json last message: " + JSON.stringify(lastMessage.behavior_list));
+
 
 
   // Header containing CARMEN img and current connection status
@@ -73,6 +61,10 @@ function App() {
   // Right half contains box with prompts, box with behaviors, and send button stacked
   return (
     <div>
+      {/* <header>
+        <CarmenImg />
+        <label>{connectionStatus}</label>
+      </header> */}
       <div
         style={{
           display: "flex",
@@ -102,58 +94,57 @@ function App() {
               {messageHistory && 
                 Object.entries(messageHistory).map((message, index) => {
                   console.log("message: " + JSON.stringify(message[1]));
-                  const messageValue = message[1];
-                  const hasPrompt = (messageValue).hasOwnProperty("Prompt");
-                  const hasAnimation = (messageValue).hasOwnProperty("Animation");
-                  const hasFunction = (messageValue).hasOwnProperty("function");
-                  const isCurrBehavior = lastJsonMessage.current_behavior.curr_behavior_idx == index ? "currBtn" : "";
+
+                  const hasPrompt = message.hasOwnProperty("Prompt");
                   console.log("hasPrompt: " + hasPrompt);
                   return (
                   <div key={index} style={{ marginBottom: "20px" }}>
                     {hasPrompt ? (
                       <Button
                         key="Prompt"
-                        name={`Prompt: ${JSON.stringify(messageValue.Prompt)}`}
-                        className={isCurrBehavior}
+                        name={`Prompt: ${JSON.stringify(message.Prompt)}`}
                         onButtonClick={() => {
+                        console.log("Button clicked - Key: prompt", "Value:", message.Prompt);
                         }}
                       />
                       ) : (
-
-                      hasAnimation ? (
-                      <Button
-                        key="Animation"
-                        name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
-                        className={isCurrBehavior}
-                        onButtonClick={() => {
-                        }}
-                      />
-
-                      ) : (
-
-                        hasFunction ? (
-                          <Button
-                        key="function"
-                        name={`Action: ${JSON.stringify(messageValue.function)}`}
-                        className={isCurrBehavior}
-                        onButtonClick={() => {
-                        }}
-                      />
-                      ) : (
-
-                        Object.entries(messageValue).map(([key, value]) => (
+                        Object.entries(message).map(([key, value]) => (
                           <Button
                             key={key}
                             name={`${key}: ${JSON.stringify(value)}`}
-                            className={isCurrBehavior}
                             onButtonClick={() => {
+                            console.log("Button clicked - Key:", key, "Value:", value);
                             }}
                             />
                       ))
-                )))}
+                    )}
                 </div>  
                 );
                 })}
+              {/* <div key={index} style={{ marginBottom: "20px" }}>
+              {Object.entries(message).map(([key, value]) => ( */}
+              {/* //     <Button */}
+              {/* //     key={key}
+              //     name={`${key}: ${JSON.stringify(value)}`}
+              //     onButtonClick={() => { */}
+              {/* //       console.log("Button clicked - Key:", key, "Value:", value);
+              //     }}
+              //     />
+              //   ))}
+              //   </div> */}
+              {/* {messageHistory.length > 0 && (
+                <div>
+                  {Object.entries(messageHistory).map(([key, value]) => (
+                    <Button
+                    key={key}
+                    name={`${key}: ${value}`}
+                    onButtonClick={() => {
+                      console.log("Button clicked - Key:", key, "Value:", value);
+                    }}
+                  />
+                  ))}
+                </div>
+              )} */}
             </div>
           </div>
           </div>
@@ -183,25 +174,9 @@ function App() {
               console.log(promptState);
               console.log(animationState);
               sendJsonMessage({
-                type: "interrupt",
                 prompt: { promptState },
                 animation: { animationState },
-                token: token,
               });
-              // console.log(roboturl + "/interrupt");
-              // fetch(roboturl + "/interrupt", {
-              //   method: "POST",
-              //   headers: {
-              //     "Content-Type": "application/json",
-              //     Authorization: `Bearer ${token}`,
-              //   },
-              //   body: JSON.stringify({
-              //     prompt: { promptState },
-              //     animation: { animationState },
-              //   }),
-              // }).catch((error) => {
-              //   console.error("Error:", error);
-              // });
               setPrompt("");
               setAnimation("");
             }}
