@@ -22,12 +22,7 @@ function App() {
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket(socketUrl, {heartbeat: {
-      message: 'PING',
-      returnMessage: "PONG",
-      timeout: 60000,
-      interval: 10000,
-    }} );
+    useWebSocket(socketUrl);
 
   //Translate readyState meaning
   const connectionStatus = {
@@ -116,7 +111,6 @@ function App() {
                       <Button
                         key="Animation"
                         name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
-                        className={isCurrBehavior}
                         onButtonClick={() => {
                         }}
                       />
@@ -127,7 +121,6 @@ function App() {
                           <Button
                         key="function"
                         name={`Action: ${JSON.stringify(messageValue.function)}`}
-                        className={isCurrBehavior}
                         onButtonClick={() => {
                         }}
                       />
@@ -137,7 +130,6 @@ function App() {
                           <Button
                             key={key}
                             name={`${key}: ${JSON.stringify(value)}`}
-                            className={isCurrBehavior}
                             onButtonClick={() => {
                             }}
                             />

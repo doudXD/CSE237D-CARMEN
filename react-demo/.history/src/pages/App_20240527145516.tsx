@@ -22,12 +22,7 @@ function App() {
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
   const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket(socketUrl, {heartbeat: {
-      message: 'PING',
-      returnMessage: "PONG",
-      timeout: 60000,
-      interval: 10000,
-    }} );
+    useWebSocket(socketUrl);
 
   //Translate readyState meaning
   const connectionStatus = {
