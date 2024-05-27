@@ -101,6 +101,7 @@ function App() {
                         key="Prompt"
                         name={`Prompt: ${JSON.stringify(messageValue.Prompt)}`}
                         onButtonClick={() => {
+                        // console.log("Button clicked - Key: prompt", "Value:", message);
                         }}
                       />
                       ) : (
@@ -110,6 +111,7 @@ function App() {
                         key="Animation"
                         name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
                         onButtonClick={() => {
+                        // console.log("Button clicked - Key: prompt", "Value:", message);
                         }}
                       />
 
@@ -120,6 +122,7 @@ function App() {
                         key="function"
                         name={`Action: ${JSON.stringify(messageValue.function)}`}
                         onButtonClick={() => {
+                        // console.log("Button clicked - Key: prompt", "Value:", message);
                         }}
                       />
                       ) : (
@@ -129,6 +132,7 @@ function App() {
                             key={key}
                             name={`${key}: ${JSON.stringify(value)}`}
                             onButtonClick={() => {
+                            // console.log("Button clicked - Key:", key, "Value:", value);
                             }}
                             />
                       ))

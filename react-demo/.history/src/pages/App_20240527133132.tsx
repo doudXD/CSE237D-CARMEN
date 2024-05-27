@@ -39,15 +39,18 @@ function App() {
 
   // UseEffect to handle incoming messages from CARMEN
   useEffect(() => {
-    console.log("lastJson: " + JSON.stringify(lastJsonMessage));
-    if (lastJsonMessage !== null && Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) && lastJsonMessage.current_behavior.curr_behavior_list.every(item => typeof item === 'object' && item !== null)) {
+    if (lastJsonMessage !== null && Array.isArray(lastJsonMessage.curr_behavior_list) && lastJsonMessage.curr_behavior_list.every(item => typeof item === 'object' && item !== null)) {
       // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
-      setMessageHistory (lastJsonMessage.current_behavior.curr_behavior_list);
+      setMessageHistory(prev => [...prev, ...(lastJsonMessage.curr_behavior_list)]);
 
     }
   }, [lastJsonMessage]);
 
   console.log("json message history: " + JSON.stringify(messageHistory));
+
+  const lastMessage = messageHistory.length > 0 ? messageHistory[messageHistory.length - 1] : null;
+
+  // console.log("json last message: " + JSON.stringify(lastMessage.behavior_list));
 
 
 
@@ -85,57 +88,57 @@ function App() {
           <div> Connection Status: {connectionStatus} </div>
           <div>
             <div style={{ marginTop: "20px", height: "400px", overflowY: "auto" }}>
-              
-              {messageHistory && 
-                Object.entries(messageHistory).map((message, index) => {
-                  console.log("message: " + JSON.stringify(message[1]));
-                  const messageValue = message[1];
-                  const hasPrompt = (messageValue).hasOwnProperty("Prompt");
-                  const hasAnimation = (messageValue).hasOwnProperty("Animation");
-                  const hasFunction = (messageValue).hasOwnProperty("function");
-                  console.log("hasPrompt: " + hasPrompt);
+              {lastMessage && 
+                lastMessage.map((message, index) => {
+                  const hasPrompt = message.hasOwnProperty("Prompt");
                   return (
                   <div key={index} style={{ marginBottom: "20px" }}>
                     {hasPrompt ? (
                       <Button
                         key="Prompt"
-                        name={`Prompt: ${JSON.stringify(messageValue.Prompt)}`}
+                        name={`Prompt: ${JSON.stringify(message.Prompt)}`}
                         onButtonClick={() => {
+                        console.log("Button clicked - Key: prompt", "Value:", message.prompt);
                         }}
                       />
                       ) : (
-
-                      hasAnimation ? (
-                      <Button
-                        key="Animation"
-                        name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
-                        onButtonClick={() => {
-                        }}
-                      />
-
-                      ) : (
-
-                        hasFunction ? (
-                          <Button
-                        key="function"
-                        name={`Action: ${JSON.stringify(messageValue.function)}`}
-                        onButtonClick={() => {
-                        }}
-                      />
-                      ) : (
-
-                        Object.entries(messageValue).map(([key, value]) => (
+                        Object.entries(message).map(([key, value]) => (
                           <Button
                             key={key}
                             name={`${key}: ${JSON.stringify(value)}`}
                             onButtonClick={() => {
+                            console.log("Button clicked - Key:", key, "Value:", value);
                             }}
                             />
                       ))
-                )))}
+                    )}
                 </div>  
                 );
                 })}
+              {/* <div key={index} style={{ marginBottom: "20px" }}>
+              {Object.entries(message).map(([key, value]) => ( */}
+              {/* //     <Button */}
+              {/* //     key={key}
+              //     name={`${key}: ${JSON.stringify(value)}`}
+              //     onButtonClick={() => { */}
+              {/* //       console.log("Button clicked - Key:", key, "Value:", value);
+              //     }}
+              //     />
+              //   ))}
+              //   </div> */}
+              {/* {messageHistory.length > 0 && (
+                <div>
+                  {Object.entries(messageHistory).map(([key, value]) => (
+                    <Button
+                    key={key}
+                    name={`${key}: ${value}`}
+                    onButtonClick={() => {
+                      console.log("Button clicked - Key:", key, "Value:", value);
+                    }}
+                  />
+                  ))}
+                </div>
+              )} */}
             </div>
           </div>
           </div>

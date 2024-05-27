@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { ReadyState } from "react-use-websocket"; // Import the ReadyState type
 
@@ -10,8 +10,8 @@ import { CarmenImg } from "../components/CarmenImg";
 
 //URLs for mock server and bot connection
 const LOCAL_URL = "ws://127.0.0.1:800";
-const BOT_URL =  "ws://100.84.26.84:5000";
-                      
+const BOT_URL = "ws://100.84.29.19:5000";
+
 import "./App.css";
 /**
  * Base Container of Web App
@@ -37,22 +37,8 @@ function App() {
   const [promptState, setPrompt] = useState("");
   const [animationState, setAnimation] = useState("");
 
-  // UseEffect to handle incoming messages from CARMEN
-  useEffect(() => {
-    console.log("lastJson: " + JSON.stringify(lastJsonMessage));
-    if (lastJsonMessage !== null && Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) && lastJsonMessage.current_behavior.curr_behavior_list.every(item => typeof item === 'object' && item !== null)) {
-      // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
-      setMessageHistory (lastJsonMessage.current_behavior.curr_behavior_list);
-
-    }
-  }, [lastJsonMessage]);
-
-  console.log("json message history: " + JSON.stringify(messageHistory));
-
-
-
   // Header containing CARMEN img and current connection status
-  // Left half will display activites 
+  // Left half will display activites
   // Right half contains box with prompts, box with behaviors, and send button stacked
   return (
     <div>
@@ -82,63 +68,7 @@ function App() {
             }}>
             Under Construction: Displayed Activities
           </label>
-          <div> Connection Status: {connectionStatus} </div>
-          <div>
-            <div style={{ marginTop: "20px", height: "400px", overflowY: "auto" }}>
-              
-              {messageHistory && 
-                Object.entries(messageHistory).map((message, index) => {
-                  console.log("message: " + JSON.stringify(message[1]));
-                  const messageValue = message[1];
-                  const hasPrompt = (messageValue).hasOwnProperty("Prompt");
-                  const hasAnimation = (messageValue).hasOwnProperty("Animation");
-                  const hasFunction = (messageValue).hasOwnProperty("function");
-                  console.log("hasPrompt: " + hasPrompt);
-                  return (
-                  <div key={index} style={{ marginBottom: "20px" }}>
-                    {hasPrompt ? (
-                      <Button
-                        key="Prompt"
-                        name={`Prompt: ${JSON.stringify(messageValue.Prompt)}`}
-                        onButtonClick={() => {
-                        }}
-                      />
-                      ) : (
-
-                      hasAnimation ? (
-                      <Button
-                        key="Animation"
-                        name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
-                        onButtonClick={() => {
-                        }}
-                      />
-
-                      ) : (
-
-                        hasFunction ? (
-                          <Button
-                        key="function"
-                        name={`Action: ${JSON.stringify(messageValue.function)}`}
-                        onButtonClick={() => {
-                        }}
-                      />
-                      ) : (
-
-                        Object.entries(messageValue).map(([key, value]) => (
-                          <Button
-                            key={key}
-                            name={`${key}: ${JSON.stringify(value)}`}
-                            onButtonClick={() => {
-                            }}
-                            />
-                      ))
-                )))}
-                </div>  
-                );
-                })}
-            </div>
-          </div>
-          </div>
+        </div>
         <div
           style={{
             display: "flex",
@@ -177,4 +107,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
