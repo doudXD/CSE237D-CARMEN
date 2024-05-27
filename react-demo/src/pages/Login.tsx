@@ -99,6 +99,7 @@ const Login = (props) => {
     <div className={"mainContainer"}>
       <div className={"titleContainer"}>
         <div>HELLO FROM CARMEN!</div>
+        <div>Connection Status: {connectionStatus}</div>
       </div>
       <br />
       <div className={"inputContainer"}>

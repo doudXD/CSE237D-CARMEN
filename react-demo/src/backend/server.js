@@ -21,7 +21,7 @@ wsServer.on("connection", function handleNewConnection(connection) {
   connection.on("message", (message) =>
     processReceivedMessage(message, connection),
   );
-  connection.on("close", () => handleClientDisconnection(userId));
+  connection.on("close", () => handleClientDisconnection());
 });
 
 // Handle incoming messages from clients
@@ -32,3 +32,8 @@ function processReceivedMessage(message, connection) {
     console.log(JSON.stringify({ status: "success", token: "12345" }));
     connection.send(JSON.stringify({ status: "success", token: "12345" }));
   }
+
+// Handle client disconnections
+function handleClientDisconnection() {
+  console.log(`Client disconnected`);
+}

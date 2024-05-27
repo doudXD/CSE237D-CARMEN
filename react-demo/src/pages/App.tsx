@@ -100,6 +100,7 @@ function App() {
                 type: "interrupt",
                 prompt: { promptState },
                 animation: { animationState },
+                token: token,
               });
               // console.log(roboturl + "/interrupt");
               // fetch(roboturl + "/interrupt", {
