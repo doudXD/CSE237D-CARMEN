@@ -80,7 +80,7 @@ function App() {
             marginBottom: "100px",
             justifyContent: "center",
             alignItems: "stretch",
-            marginTop: "10%",
+            marginTop: "5%",
             padding: "0% 5%",
             gap: "15px",
           }}>

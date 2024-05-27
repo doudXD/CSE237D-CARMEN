@@ -80,7 +80,7 @@ function App() {
             marginBottom: "100px",
             justifyContent: "center",
             alignItems: "stretch",
-            marginTop: "10%",
+            marginTop: "20%",
             padding: "0% 5%",
             gap: "15px",
           }}>
@@ -92,7 +92,7 @@ function App() {
           </label>
           <div> Connection Status: {connectionStatus} </div>
           <div>
-            <div style={{ marginTop: "20px", height: "600px", overflowY: "auto" }}>
+            <div style={{ marginTop: "20px", height: "400px", overflowY: "auto" }}>
               
               {messageHistory && 
                 Object.entries(messageHistory).map((message, index) => {
@@ -179,8 +179,8 @@ function App() {
               console.log(animationState);
               sendJsonMessage({
                 type: "interrupt",
-                promptState,
-                animationState,
+                prompt: { promptState },
+                animation: { animationState },
                 token: token,
               });
               // console.log(roboturl + "/interrupt");

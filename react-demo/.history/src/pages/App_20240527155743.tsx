@@ -73,14 +73,14 @@ function App() {
           display: "flex",
           flexDirection: "row",
         }}>
-        <div
+        {/* <div
           style={{
             flexDirection: "column",
             width: "50%",
             marginBottom: "100px",
             justifyContent: "center",
             alignItems: "stretch",
-            marginTop: "10%",
+            marginTop: "20%",
             padding: "0% 5%",
             gap: "15px",
           }}>
@@ -89,9 +89,9 @@ function App() {
               fontSize: "35px",
             }}>
             Under Construction: Displayed Activities
-          </label>
+          </label> */}
           <div> Connection Status: {connectionStatus} </div>
-          <div>
+          <div style={{width: "50%"}}>
             <div style={{ marginTop: "20px", height: "600px", overflowY: "auto" }}>
               
               {messageHistory && 
@@ -150,7 +150,7 @@ function App() {
                 );
                 })}
             </div>
-          </div>
+          {/* </div> */}
           </div>
         <div
           style={{
