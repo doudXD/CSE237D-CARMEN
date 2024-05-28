@@ -27,6 +27,10 @@ wsServer.on("connection", function handleNewConnection(connection) {
 // Handle incoming messages from clients
 function processReceivedMessage(message, connection) {
     console.log(message.toString());
+    if (message.toString() === "PING") {
+      connection.send("PONG");
+      return
+    }
     message = JSON.parse(message);
     if (message.type === "auth") {
       console.log("Authenticating user");
@@ -42,7 +46,7 @@ function authenticateUser(message, connection) {
         connection.send(JSON.stringify({status: "success", token: "12345"}));
     } else {
         console.log("User not authenticated");
-        connection.send(JSON.stringify({status: "failure" }));
+        connection.send(JSON.stringify({status: "error" }));
     }
 }
 // Handle client disconnections
