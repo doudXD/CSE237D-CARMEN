@@ -27,12 +27,24 @@ wsServer.on("connection", function handleNewConnection(connection) {
 // Handle incoming messages from clients
 function processReceivedMessage(message, connection) {
     console.log(message.toString());
-    // send json msg to the client
-    console.log("Sending token to the client");
-    console.log(JSON.stringify({ status: "success", token: "12345" }));
-    connection.send(JSON.stringify({ status: "success", token: "12345" }));
+    message = JSON.parse(message);
+    if (message.type === "auth") {
+      console.log("Authenticating user");
+      authenticateUser(message, connection);
+    } else if (message.type === "interrupt") {
+      console.log("Interruption request");
+    }
   }
 
+function authenticateUser(message, connection) {
+    if (message.username === "admin" && message.password === "pwd") {
+        console.log("User authenticated");
+        connection.send(JSON.stringify({status: "success", token: "12345"}));
+    } else {
+        console.log("User not authenticated");
+        connection.send(JSON.stringify({status: "failure" }));
+    }
+}
 // Handle client disconnections
 function handleClientDisconnection() {
   console.log(`Client disconnected`);

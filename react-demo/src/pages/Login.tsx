@@ -99,7 +99,7 @@ const Login = (props) => {
     <div className={"mainContainer"}>
       <div className={"titleContainer"}>
         <div>HELLO FROM CARMEN!</div>
-        <div>Connection Status: {connectionStatus}</div>
+        {/* <div>Connection Status: {connectionStatus}</div> */}
       </div>
       <br />
       <div className={"inputContainer"}>
@@ -114,6 +114,7 @@ const Login = (props) => {
       <br />
       <div className={"inputContainer"}>
         <input
+          type="password"
           value={password}
           placeholder="Enter your password"
           onChange={(ev) => setPassword(ev.target.value)}
