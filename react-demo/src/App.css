@@ -3,10 +3,11 @@ div.ButtonContainer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 25px 40px;
+    padding: 1.5em 2.5em;
     /* margin-right: "10%"; */
-    gap: 20px;
+    gap: 1.25em;
     border: 5px outset black;
+    min-width: 14.75em;
 }
 
 div.ButtonContainerRow {
@@ -16,7 +17,7 @@ div.ButtonContainerRow {
     align-items: center;
     /* padding: 25px 50px 75px 100px; */
     /* margin-right: "10%"; */
-    gap: 20px;
+    gap: 1.25em;
     /* border: 5px outset black; */
 }
 
@@ -27,9 +28,19 @@ button.currBtn{
 }
 
 button.PromptButton{
-    width: 240px;
+    width: 5.9em;
+    text-align: center;
 }
 
 button.AnimationButton{
-    width: 140px;
+    width: 3.75em;
+    text-align: center;
 }
+
+body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 70em;
+    min-height: 100vh;
+  }

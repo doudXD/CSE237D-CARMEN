@@ -39,6 +39,7 @@ function App() {
   // Left half will display activites
   // Right half contains box with prompts, box with behaviors, and send button stacked 
   return (
+    <>
     <div>
       <header>
           <CarmenImg />
@@ -47,7 +48,8 @@ function App() {
       <div
         style={{
           display:"flex",
-          flexDirection: "row"
+          flexDirection: "row",
+          minWidth: "30em"
         }}>
         <div
           style={{
@@ -71,10 +73,10 @@ function App() {
             width: "50%",
             marginBottom: "100px",
             justifyContent: "center",
-            alignItems: "stretch",
+            //alignItems: "stretch",
             marginTop: "2%",
             padding: "0% 5%",
-            gap: "15px"
+            gap: "15px",
           }}>
           <PromptOptions setPrompt={setPrompt} promptState={promptState} />
           <AnimationOptions setAnimation={setAnimation} animationState={animationState} />
@@ -97,6 +99,7 @@ function App() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

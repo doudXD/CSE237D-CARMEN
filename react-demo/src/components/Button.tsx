@@ -19,7 +19,7 @@ function Button({
       onClick={onButtonClick}
       style={{
         fontSize: "35px",
-        padding: "10px 20px",
+        padding: "10px 0px",
         //marginRight: "20%", // Add some space between the button and the image
       }}>
       {name}
