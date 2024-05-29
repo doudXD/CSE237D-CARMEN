@@ -29,9 +29,9 @@ const Login = (props) => {
 
       if (lastJsonMessage.status === "success") {
         props.setLoggedIn(true);
-        navigate("/app", {
-          state: { socketUrl: url, token: lastJsonMessage.token },
-        });
+        props.setSocketUrl(url);
+        props.setToken(lastJsonMessage.token);
+        navigate("/app");
       } else if (lastJsonMessage.status === "error") {
         window.alert("Wrong username or password");
       }

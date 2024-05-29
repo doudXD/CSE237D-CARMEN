@@ -5,14 +5,8 @@ import { ReadyState } from "react-use-websocket";
 import { PromptOptions } from "../containers/PromptOptions";
 import { AnimationOptions } from "../containers/AnimationOptions";
 import { Button } from "../components/Button";
-import { useLocation } from "react-router-dom";
 
 import History from "./History";
-
-interface LocationState {
-  socketUrl: string;
-  token: string;
-}
 
 import "./App.css";
 /**
@@ -24,18 +18,15 @@ const App = (props) => {
   // const BOT_URL = "ws://100.84.29.19:5000";
 
   //Get URL and token from previous page
-  const location = useLocation();
-  const { socketUrl = "ws://127.0.0.1:800", token } =
-    (location.state as LocationState) || {};
 
   //Setup state of prompt and animation values
   const [promptState, setPrompt] = useState("");
   const [animationState, setAnimation] = useState("");
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
-
+  console.log("YOGIGIIIIIII", props.socketUrl);
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
-    socketUrl,
+    props.socketUrl,
     {
       heartbeat: {
         message: "PING",
@@ -43,6 +34,8 @@ const App = (props) => {
         timeout: 60000,
         interval: 10000,
       },
+      reconnectAttempts: 10, // Number of reconnection attempts
+      reconnectInterval: 3000, // Time to wait between reconnection attempts (in milliseconds)
     }
   );
 
@@ -201,7 +194,7 @@ const App = (props) => {
                 type: "interrupt",
                 promptState,
                 animationState,
-                token: token,
+                token: props.token,
               });
               setPrompt("");
               setAnimation("");

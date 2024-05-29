@@ -17,6 +17,8 @@ interface Interruption {
 const Main = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [interruptions, setInterruptions] = useState<Interruption[]>([]);
+  const [socketUrl, setSocketUrl] = useState("");
+  const [token, setToken] = useState("");
 
   return (
     <React.StrictMode>
@@ -29,6 +31,8 @@ const Main = () => {
               <App
                 interruptions={interruptions}
                 setInterruptions={setInterruptions}
+                socketUrl={socketUrl}
+                token={token}
               />
             }
           />
@@ -40,7 +44,16 @@ const Main = () => {
             path="/history"
             element={<History interruptions={interruptions} />}
           />
-          <Route path="/" element={<Login setLoggedIn={setLoggedIn} />} />
+          <Route
+            path="/"
+            element={
+              <Login
+                setLoggedIn={setLoggedIn}
+                setSocketUrl={setSocketUrl}
+                setToken={setToken}
+              />
+            }
+          />
         </Routes>
       </Router>
     </React.StrictMode>
