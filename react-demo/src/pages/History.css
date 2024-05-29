@@ -1,0 +1,46 @@
+.mainHistoryContainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 200px;
+    font-size: 64px;
+    font-weight: bolder;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    height: 880px;
+}
+
+.historyContainer {
+    overflow-y: auto;
+    height: 880px;
+}
+
+.interruptionContainer {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    font-size: 32px;
+    width: 2000px;
+}
+
+.promptContainer,
+.animationContainer,
+.timeContainer {
+    flex: 1;
+}
+
+.promptContainer h2,
+.animationContainer h2,
+.timeContainer h2 {
+    color: #666;
+}
+
+.promptContainer p,
+.animationContainer p,
+.timeContainer p {
+    color: #333;
+}

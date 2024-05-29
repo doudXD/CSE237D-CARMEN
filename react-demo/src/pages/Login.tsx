@@ -32,8 +32,8 @@ const Login = (props) => {
         navigate("/app", {
           state: { socketUrl: url, token: lastJsonMessage.token },
         });
-      } else if (lastJsonMessage.status === "error") {
-        window.alert("Wrong username or password");
+      } else {
+        window.alert("Wrong email or password");
       }
     }
   }, [lastJsonMessage]);
@@ -58,12 +58,6 @@ const Login = (props) => {
     }
 
     if (username !== "" && password !== "" && url !== "") {
-      if (readyState !== ReadyState.OPEN) {
-        window.alert(
-          "Cannot connect to the robot. Please check the robot url or try again later."
-        );
-        return;
-      }
       console.log("sending");
       console.log(username);
       console.log(password);

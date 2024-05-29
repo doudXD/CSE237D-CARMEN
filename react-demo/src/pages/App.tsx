@@ -7,6 +7,8 @@ import { AnimationOptions } from "../containers/AnimationOptions";
 import { Button } from "../components/Button";
 import { useLocation } from "react-router-dom";
 
+import History from "./History";
+
 interface LocationState {
   socketUrl: string;
   token: string;
@@ -16,7 +18,7 @@ import "./App.css";
 /**
  * Base Container of Web App
  */
-function App() {
+const App = (props) => {
   // URLs for mock server and bot connection
   // const LOCAL_URL = "ws://127.0.0.1:800";
   // const BOT_URL = "ws://100.84.29.19:5000";
@@ -32,13 +34,17 @@ function App() {
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
-  const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket(socketUrl, {heartbeat: {
-      message: 'PING',
-      returnMessage: "PONG",
-      timeout: 60000,
-      interval: 10000,
-    }} );
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
+    socketUrl,
+    {
+      heartbeat: {
+        message: "PING",
+        returnMessage: "PONG",
+        timeout: 60000,
+        interval: 10000,
+      },
+    }
+  );
 
   //Translate readyState meaning
   const connectionStatus = {
@@ -51,20 +57,24 @@ function App() {
 
   // UseEffect to handle incoming messages from CARMEN
   useEffect(() => {
+    console.log("interruptions: " + JSON.stringify(props.interruptions));
     console.log("lastJson: " + JSON.stringify(lastJsonMessage));
-    if (lastJsonMessage !== null && Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) && lastJsonMessage.current_behavior.curr_behavior_list.every(item => typeof item === 'object' && item !== null)) {
+    if (
+      lastJsonMessage !== null &&
+      Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) &&
+      lastJsonMessage.current_behavior.curr_behavior_list.every(
+        (item) => typeof item === "object" && item !== null
+      )
+    ) {
       // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
-      setMessageHistory (lastJsonMessage.current_behavior.curr_behavior_list);
-
+      setMessageHistory(lastJsonMessage.current_behavior.curr_behavior_list);
     }
-  }, [lastJsonMessage]);
+  }, [lastJsonMessage, props.interruptions]);
 
   // console.log("json message history: " + JSON.stringify(messageHistory));
 
-
-
   // Header containing CARMEN img and current connection status
-  // Left half will display activites 
+  // Left half will display activites
   // Right half contains box with prompts, box with behaviors, and send button stacked
   return (
     <div>
@@ -92,66 +102,65 @@ function App() {
           </label>
           <div> Connection Status: {connectionStatus} </div>
           <div>
-            <div style={{ marginTop: "20px", height: "600px", overflowY: "auto" }}>
-              
-              {messageHistory && 
+            <div
+              style={{ marginTop: "20px", height: "600px", overflowY: "auto" }}>
+              {messageHistory &&
                 Object.entries(messageHistory).map((message, index) => {
                   // console.log("message: " + JSON.stringify(message[1]));
                   const messageValue = message[1];
-                  const hasPrompt = (messageValue).hasOwnProperty("Prompt");
-                  const hasAnimation = (messageValue).hasOwnProperty("Animation");
-                  const hasFunction = (messageValue).hasOwnProperty("function");
-                  const isCurrBehavior = lastJsonMessage.current_behavior.curr_behavior_idx == index ? "currBtn" : "";
+                  const hasPrompt = messageValue.hasOwnProperty("Prompt");
+                  const hasAnimation = messageValue.hasOwnProperty("Animation");
+                  const hasFunction = messageValue.hasOwnProperty("function");
+                  const isCurrBehavior =
+                    lastJsonMessage.current_behavior.curr_behavior_idx == index
+                      ? "currBtn"
+                      : "";
                   // console.log("hasPrompt: " + hasPrompt);
                   return (
-                  <div key={index} style={{ marginBottom: "20px" }}>
-                    {hasPrompt ? (
-                      <Button
-                        key="Prompt"
-                        name={`Prompt: ${JSON.stringify(messageValue.Prompt)}`}
-                        className={isCurrBehavior}
-                        onButtonClick={() => {
-                        }}
-                      />
+                    <div key={index} style={{ marginBottom: "20px" }}>
+                      {hasPrompt ? (
+                        <Button
+                          key="Prompt"
+                          name={`Prompt: ${JSON.stringify(
+                            messageValue.Prompt
+                          )}`}
+                          className={isCurrBehavior}
+                          onButtonClick={() => {}}
+                        />
+                      ) : hasAnimation ? (
+                        <Button
+                          key="Animation"
+                          name={`Animation: ${JSON.stringify(
+                            messageValue.Animation
+                          )}`}
+                          className={isCurrBehavior}
+                          onButtonClick={() => {}}
+                        />
+                      ) : hasFunction ? (
+                        <Button
+                          key="function"
+                          name={`Action: ${JSON.stringify(
+                            messageValue.function
+                          )}`}
+                          className={isCurrBehavior}
+                          onButtonClick={() => {}}
+                        />
                       ) : (
-
-                      hasAnimation ? (
-                      <Button
-                        key="Animation"
-                        name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
-                        className={isCurrBehavior}
-                        onButtonClick={() => {
-                        }}
-                      />
-
-                      ) : (
-
-                        hasFunction ? (
-                          <Button
-                        key="function"
-                        name={`Action: ${JSON.stringify(messageValue.function)}`}
-                        className={isCurrBehavior}
-                        onButtonClick={() => {
-                        }}
-                      />
-                      ) : (
-
                         Object.entries(messageValue).map(([key, value]) => (
                           <Button
                             key={key}
                             name={`${key}: ${JSON.stringify(value)}`}
                             className={isCurrBehavior}
-                            onButtonClick={() => {
-                            }}
-                            />
-                      ))
-                )))}
-                </div>  
-                );
+                            onButtonClick={() => {}}
+                          />
+                        ))
+                      )}
+                    </div>
+                  );
                 })}
             </div>
           </div>
-          </div>
+        </div>
         <div
           style={{
             display: "flex",
@@ -177,26 +186,23 @@ function App() {
               console.log("sending");
               console.log(promptState);
               console.log(animationState);
+
+              const newInterruption = {
+                promptState,
+                animationState,
+                time: new Date().toISOString(),
+              };
+              console.log(
+                "newInterruption: " + JSON.stringify(newInterruption)
+              );
+              props.setInterruptions([...props.interruptions, newInterruption]);
+              <History interruptions={props.interruptions} />;
               sendJsonMessage({
                 type: "interrupt",
                 promptState,
                 animationState,
                 token: token,
               });
-              // console.log(roboturl + "/interrupt");
-              // fetch(roboturl + "/interrupt", {
-              //   method: "POST",
-              //   headers: {
-              //     "Content-Type": "application/json",
-              //     Authorization: `Bearer ${token}`,
-              //   },
-              //   body: JSON.stringify({
-              //     prompt: { promptState },
-              //     animation: { animationState },
-              //   }),
-              // }).catch((error) => {
-              //   console.error("Error:", error);
-              // });
               setPrompt("");
               setAnimation("");
             }}
@@ -205,5 +211,5 @@ function App() {
       </div>
     </div>
   );
-}
+};
 export default App;
