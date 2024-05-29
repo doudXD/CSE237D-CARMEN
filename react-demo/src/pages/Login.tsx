@@ -32,8 +32,8 @@ const Login = (props) => {
         navigate("/app", {
           state: { socketUrl: url, token: lastJsonMessage.token },
         });
-      } else {
-        window.alert("Wrong email or password");
+      } else if (lastJsonMessage.status === "error") {
+        window.alert("Wrong username or password");
       }
     }
   }, [lastJsonMessage]);
