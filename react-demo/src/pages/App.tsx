@@ -22,9 +22,10 @@ const App = (props) => {
   //Setup state of prompt and animation values
   const [promptState, setPrompt] = useState("");
   const [animationState, setAnimation] = useState("");
+  const [currInterrupt, setCurrInterrupt] = useState(null);
+  const [idxTrack, setIdxTrack] = useState(null);
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
-  console.log("YOGIGIIIIIII", props.socketUrl);
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     props.socketUrl,
     {
@@ -47,22 +48,192 @@ const App = (props) => {
     [ReadyState.CLOSED]: "Closed",
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
+  
 
   // UseEffect to handle incoming messages from CARMEN
   useEffect(() => {
     console.log("interruptions: " + JSON.stringify(props.interruptions));
     console.log("lastJson: " + JSON.stringify(lastJsonMessage));
-    if (
-      lastJsonMessage !== null &&
-      Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) &&
+    if (lastJsonMessage !== null){
+      if(lastJsonMessage.current_behavior.interruption != null){
+        //TODO: increment to curr behavior with interruption
+        console.log("now current behavior is an interrupt");
+        setCurrInterrupt({
+          "idx": currInterrupt.idx,
+          "promptState": currInterrupt.promptState,
+          "animationState": currInterrupt.animationState,
+          "active": true,
+        });
+
+      }
+      else if(Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) &&
       lastJsonMessage.current_behavior.curr_behavior_list.every(
         (item) => typeof item === "object" && item !== null
       )
     ) {
       // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
+      if(currInterrupt != null && (messageHistory != lastJsonMessage.current_behavior.curr_behavior_list || idxTrack != lastJsonMessage.current_behavior.curr_behavior_idx)){
+        if(currInterrupt == null || currInterrupt.idx <= 0){
+          console.log("first conditional" + currInterrupt);
+          setCurrInterrupt(null);
+        }
+        else{
+          console.log("second conditional" + currInterrupt);
+          setCurrInterrupt({
+            "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt.idx - 1 : currInterrupt.idx),
+            "promptState": currInterrupt.promptState,
+            "animationState": currInterrupt.animationState,
+            "active": false,
+          });
+          // if(currentInterrupt.idx == lastJsonMessage.current_behavior.curr_behavior_idx){
+          //   sendJsonMessage({
+          //     type: "interrupt",
+          //     promptState,
+          //     animationState,
+          //     token: props.token,
+          //   });
+          // }
+        }
+      }
+
       setMessageHistory(lastJsonMessage.current_behavior.curr_behavior_list);
-    }
+      setIdxTrack(lastJsonMessage.current_behavior.curr_behavior_idx);
+    }}
   }, [lastJsonMessage, props.interruptions]);
+
+
+
+  var displayedActivities = (messageHistory &&
+    Object.entries(messageHistory).map((message, index) => {
+      // console.log("message: " + JSON.stringify(message[1]));
+      const messageValue = message[1];
+      const hasPrompt = messageValue.hasOwnProperty("Prompt");
+      const hasAnimation = messageValue.hasOwnProperty("Animation");
+      const hasFunction = messageValue.hasOwnProperty("function");
+      const isCurrBehavior =
+        (idxTrack == index && (currInterrupt == null || currInterrupt.active == false))
+          ? "currBehavior"
+          : "";
+      const isCurrInterrupt = (idxTrack == index && (currInterrupt != null && currInterrupt.active == true))
+      ? "currBehavior"
+      : "";
+      if(currInterrupt != null){
+        console.log(`currInterrupt: ${idxTrack == index} ${currInterrupt != null} ${currInterrupt.active == true}`);
+      }
+      return (
+        <div>
+        <div key={index} style={{ marginBottom: "20px" }}>
+          {hasPrompt ? (
+            <Button
+              key="Prompt"
+              name={`Prompt: ${JSON.stringify(
+                messageValue.Prompt
+              )}`}
+              className={isCurrBehavior}
+              onButtonClick={() => {}}
+            />
+          ) : hasAnimation ? (
+            <Button
+              key="Animation"
+              name={`Animation: ${JSON.stringify(
+                messageValue.Animation
+              )}`}
+              className={isCurrBehavior}
+              onButtonClick={() => {}}
+            />
+          ) : hasFunction ? (
+            <Button
+              key="function"
+              name={`Action: ${JSON.stringify(
+                messageValue.function
+              )}`}
+              className={isCurrBehavior}
+              onButtonClick={() => {}}
+            />
+          ) : (
+            Object.entries(messageValue).map(([key, value]) => (
+              <Button
+                key={key}
+                name={`${key}: ${JSON.stringify(value)}`}
+                className={isCurrBehavior}
+                onButtonClick={() => {}}
+              />
+            ))
+          )}
+        </div>
+        {currInterrupt && currInterrupt.idx == index ? (
+          <div key={"interrupt"} style={{ marginBottom: "20px" }}>
+              {currInterrupt.promptState!=="" ? (
+              <Button
+                key="Prompt"
+                name={`Prompt: ${currInterrupt.promptState}`}
+                className={isCurrInterrupt}
+                onButtonClick={() => {}}
+              />
+            ) : currInterrupt.animationState!=="" ? (
+              <Button
+                key="Animation"
+                name={`Animation: ${currInterrupt.animationState}`}
+                className={isCurrInterrupt}
+                onButtonClick={() => {}}
+              />
+            ) :  <label>oops</label>}
+          </div>
+          ): <></>}
+        </div>
+      );
+    }))
+  
+  function onSendClick(){
+    //send JSON with prompt and animation and reset respective states
+    console.log("sending");
+    console.log(promptState);
+    console.log(animationState);
+    const newInterruption = {
+      promptState,
+      animationState,
+      time: new Date().toISOString(),
+    };
+    console.log(
+      "newInterruption: " + JSON.stringify(newInterruption)
+    );
+    props.setInterruptions([...props.interruptions, newInterruption]);
+    <History interruptions={props.interruptions} />;
+    //this is only true for the first interruption if after current behavior
+    sendJsonMessage({
+      type: "interrupt",
+      promptState,
+      animationState,
+      token: props.token,
+    });
+    setCurrInterrupt({
+      "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
+      promptState,
+      animationState,
+      "active": false
+    });
+    // var element = (<div key={"interrupt"} style={{ marginBottom: "20px" }}>
+    //       {promptState!=="" ? (
+    //         <Button
+    //           key="Prompt"
+    //           name={`Prompt: ${promptState}`}
+    //           className={""}
+    //           onButtonClick={() => {}}
+    //         />
+    //       ) : animationState!=="" ? (
+    //         <Button
+    //           key="Animation"
+    //           name={`Animation: ${animationState}`}
+    //           className={""}
+    //           onButtonClick={() => {}}
+    //         />
+    //       ) :  <label>oops</label>}
+    //     </div>
+    // );
+    // displayedActivities.splice(lastJsonMessage.current_behavior.curr_behavior_idx+1,0,element);
+    setPrompt("");
+    setAnimation("");
+  }
 
   // console.log("json message history: " + JSON.stringify(messageHistory));
 
@@ -97,60 +268,7 @@ const App = (props) => {
           <div>
             <div
               style={{ marginTop: "20px", height: "600px", overflowY: "auto" }}>
-              {messageHistory &&
-                Object.entries(messageHistory).map((message, index) => {
-                  // console.log("message: " + JSON.stringify(message[1]));
-                  const messageValue = message[1];
-                  const hasPrompt = messageValue.hasOwnProperty("Prompt");
-                  const hasAnimation = messageValue.hasOwnProperty("Animation");
-                  const hasFunction = messageValue.hasOwnProperty("function");
-                  const isCurrBehavior =
-                    lastJsonMessage.current_behavior.curr_behavior_idx == index
-                      ? "currBtn"
-                      : "";
-                  // console.log("hasPrompt: " + hasPrompt);
-                  return (
-                    <div key={index} style={{ marginBottom: "20px" }}>
-                      {hasPrompt ? (
-                        <Button
-                          key="Prompt"
-                          name={`Prompt: ${JSON.stringify(
-                            messageValue.Prompt
-                          )}`}
-                          className={isCurrBehavior}
-                          onButtonClick={() => {}}
-                        />
-                      ) : hasAnimation ? (
-                        <Button
-                          key="Animation"
-                          name={`Animation: ${JSON.stringify(
-                            messageValue.Animation
-                          )}`}
-                          className={isCurrBehavior}
-                          onButtonClick={() => {}}
-                        />
-                      ) : hasFunction ? (
-                        <Button
-                          key="function"
-                          name={`Action: ${JSON.stringify(
-                            messageValue.function
-                          )}`}
-                          className={isCurrBehavior}
-                          onButtonClick={() => {}}
-                        />
-                      ) : (
-                        Object.entries(messageValue).map(([key, value]) => (
-                          <Button
-                            key={key}
-                            name={`${key}: ${JSON.stringify(value)}`}
-                            className={isCurrBehavior}
-                            onButtonClick={() => {}}
-                          />
-                        ))
-                      )}
-                    </div>
-                  );
-                })}
+              {displayedActivities}
             </div>
           </div>
         </div>
@@ -174,31 +292,7 @@ const App = (props) => {
           <Button
             className=""
             name="Send"
-            onButtonClick={() => {
-              //send JSON with prompt and animation and reset respective states
-              console.log("sending");
-              console.log(promptState);
-              console.log(animationState);
-
-              const newInterruption = {
-                promptState,
-                animationState,
-                time: new Date().toISOString(),
-              };
-              console.log(
-                "newInterruption: " + JSON.stringify(newInterruption)
-              );
-              props.setInterruptions([...props.interruptions, newInterruption]);
-              <History interruptions={props.interruptions} />;
-              sendJsonMessage({
-                type: "interrupt",
-                promptState,
-                animationState,
-                token: props.token,
-              });
-              setPrompt("");
-              setAnimation("");
-            }}
+            onButtonClick={onSendClick}
           />
         </div>
       </div>

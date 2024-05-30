@@ -26,6 +26,10 @@ button.currBtn{
     color: white;
 }
 
+button.currBehavior{
+    border: 10px outset grey;
+}
+
 button.PromptButton{
     width: 240px;
 }
