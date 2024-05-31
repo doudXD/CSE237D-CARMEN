@@ -61,7 +61,6 @@ const App = (props) => {
 
   // UseEffect to handle incoming messages from CARMEN
   useEffect(() => {
-    console.log("interruptions: " + JSON.stringify(props.interruptions));
     console.log("lastJson: " + JSON.stringify(lastJsonMessage));
     if (lastJsonMessage !== null){
       //case: Carmen starting executing interruption behavior
@@ -115,6 +114,7 @@ const App = (props) => {
 
         //to send the next interrupt when current behavior is also an interrupt
         if (currInterrupt.length > index+1 && currInterrupt[index+1].idx == idxTrack){
+          console.log("sending interrupt because prior interrupt is current");
           sendJsonMessage({
             type: "interrupt",
             "promptState": currInterrupt[index+1].promptState,
@@ -138,17 +138,19 @@ const App = (props) => {
         //iterate in order to update interruption list with new idx values that correspond with new behavior list
         for(let i = 0; i < currInterrupt.length; i++){
           //if list moved up, no more need for interruptions associated with removed non-interruption behavior
-          if(currInterrupt[i].idx > 0 || idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx){
+          if(currInterrupt[i].idx > 0 || idxTrack != lastJsonMessage.current_behavior.curr_behavior_idx){
+            let newIdx = ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt[i].idx - 1 : currInterrupt[i].idx);
             updateArray.push({
-              "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt[i].idx - 1 : currInterrupt[i].idx), //move the idx up if active index has not changed
+              "idx": newIdx, //move the idx up if active index has not changed
               "promptState": currInterrupt[i].promptState,
               "animationState": currInterrupt[i].animationState,
               "active": false,
-              "selected": currInterrupt[i].selected
+              "selected": (newIdx < lastJsonMessage.current_behavior.curr_behavior_idx) ? false : currInterrupt[i].selected
             });
 
             //if current behavior has interrupts after it, send the first interrupt
-            if(currInterrupt[i].idx == lastJsonMessage.current_behavior.curr_behavior_idx && !sent){
+            if(newIdx == lastJsonMessage.current_behavior.curr_behavior_idx && !sent){
+              console.log("sending interrupt because prior behavior is current");
               sendJsonMessage({
                 type: "interrupt",
                 "promptState": currInterrupt[i].promptState,
@@ -163,22 +165,25 @@ const App = (props) => {
         setCurrInterrupt(updateArray);
       }
 
+
+      // NOTE: may cause race condition
+      let updatedIdxSelected = idxSelected;
+      if(messageHistory != lastJsonMessage.current_behavior.curr_behavior_list && idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx){
+        updatedIdxSelected = idxSelected - 1;
+      }
+
       setMessageHistory(lastJsonMessage.current_behavior.curr_behavior_list);
       setIdxTrack(lastJsonMessage.current_behavior.curr_behavior_idx);
 
-
-      //NOTE: may cause race condition
-      if(idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx){
-        setIdxSelected(idxSelected - 1);
-      }
       
       //move the selected index so that it cannot be before the active index
-      if(idxSelected < lastJsonMessage.current_behavior.curr_behavior_idx){
-        setIdxSelected(lastJsonMessage.current_behavior.curr_behavior_idx);
+      if(updatedIdxSelected < lastJsonMessage.current_behavior.curr_behavior_idx){
+        updatedIdxSelected = lastJsonMessage.current_behavior.curr_behavior_idx;
       }
+      setIdxSelected(updatedIdxSelected);
 
     }}
-  }, [lastJsonMessage, props.interruptions]);
+  }, [lastJsonMessage]);
 
   /**
    * Called when a behavior visualization button is clicked
