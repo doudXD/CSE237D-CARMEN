@@ -19,17 +19,20 @@ const App = (props) => {
 
   //Get URL and token from previous page
 
+  //style of dictionary for monitoring currently displayed interruptions
   interface currInter {
-      idx: any; 
-      promptState: string; 
-      animationState: string; 
-      active: boolean; 
+      idx: any; //index of the non-interruption behavior the interruption is associated with
+      promptState: string; //prompt of interruption
+      animationState: string;  //animation of interruption
+      active: boolean; //is this interruption the current behavior?
+      selected: boolean; // is this interruption the selected behavior?
   }
   //Setup state of prompt and animation values
-  const [promptState, setPrompt] = useState("");
-  const [animationState, setAnimation] = useState("");
-  const [currInterrupt, setCurrInterrupt] = useState<currInter[]>([]);
-  const [idxTrack, setIdxTrack] = useState(null);
+  const [promptState, setPrompt] = useState(""); //state of prompt input field
+  const [animationState, setAnimation] = useState(""); //state of animation input field
+  const [currInterrupt, setCurrInterrupt] = useState<currInter[]>([]); //list of currently displayed interruptions
+  const [idxTrack, setIdxTrack] = useState(null); //the index of the current behavior according to the last current behavior list json
+  const [idxSelected, setIdxSelected] = useState(0); //the index of the selected behavior (or associated non-interruption behavior)
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
@@ -61,15 +64,19 @@ const App = (props) => {
     console.log("interruptions: " + JSON.stringify(props.interruptions));
     console.log("lastJson: " + JSON.stringify(lastJsonMessage));
     if (lastJsonMessage !== null){
+      //case: Carmen starting executing interruption behavior
       if(lastJsonMessage.current_behavior.interruption != null){
-        //TODO: increment to curr behavior with interruption
         console.log("now current behavior is an interrupt");
+        //iterate to find index of interruption to be marked active
         let index = -1;
         for (let i = 0; i < currInterrupt.length; i++){
           if(currInterrupt[i].idx == idxTrack ){
+            //case: found first interruption associated with current non-interruption behavior
+            //this will soon be the active interruption if the current active behavior is not further in this sequence of interruptions
             if (index == -1 && !(currInterrupt[i].active)){
               index = i;
             }
+            //case: found active interruption later in sequence of interruptions so the following sequential interruption will be the soon active one
             else if(currInterrupt[i].active){
               index = i + 1;
               break;
@@ -77,8 +84,11 @@ const App = (props) => {
           }
         }
         console.log("INDEX: " + index);
-        //if(index > 0){currInterrupt[index-1].active = false;}
-        //currInterrupt[index].active = true;
+        const interruptSelected = (element) => element.selected;
+        //checks if the previous active behavior was selected
+        let prev_sel = (idxSelected == idxTrack && !currInterrupt.some(interruptSelected)) || (index > 0 && currInterrupt[index-1].selected);
+        //create an updated list of interruptions that adjust which interruptions are active and selected
+        //NOTE: may not be fully working
         const updatedInterruptions = currInterrupt.map((element, ind) => {
           if(ind == index){
             return {
@@ -86,7 +96,8 @@ const App = (props) => {
               "promptState": element.promptState,
               "animationState": element.animationState,
               "active": true,
-            }; //TODO still going dont stop
+              "selected": prev_sel,
+            };
           }
           else{
             return {
@@ -94,6 +105,7 @@ const App = (props) => {
               "promptState": element.promptState,
               "animationState": element.animationState,
               "active": false,
+              "selected": (prev_sel ? false : element.selected)
             };
           }
         });
@@ -101,21 +113,15 @@ const App = (props) => {
         console.log("UPDATED INT: " + updatedInterruptions[0]);
         setCurrInterrupt(updatedInterruptions);
 
-        if (currInterrupt.length - 1 > index && currInterrupt[index+1].idx == idxTrack){
+        //to send the next interrupt when current behavior is also an interrupt
+        if (currInterrupt.length > index+1 && currInterrupt[index+1].idx == idxTrack){
           sendJsonMessage({
             type: "interrupt",
-            "prompt": currInterrupt[index+1].promptState,
-            "animation": currInterrupt[index+1].animationState,
+            "promptState": currInterrupt[index+1].promptState,
+            "animationState": currInterrupt[index+1].animationState,
             token: props.token,
           });
         }
-
-        // setCurrInterrupt({
-        //   "idx": currInterrupt.idx,
-        //   "promptState": currInterrupt.promptState,
-        //   "animationState": currInterrupt.animationState,
-        //   "active": true,
-        // });
 
       }
       else if(Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) &&
@@ -124,44 +130,32 @@ const App = (props) => {
       )
     ) {
       // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
+      //case: Carmen started executed a non-interruption behavior
+      //this means Carmen has sent an updated list of current behaviors as an indicator
       if(currInterrupt.length > 0 && (messageHistory != lastJsonMessage.current_behavior.curr_behavior_list || idxTrack != lastJsonMessage.current_behavior.curr_behavior_idx)){
         let updateArray = [];
         let sent = false;
+        //iterate in order to update interruption list with new idx values that correspond with new behavior list
         for(let i = 0; i < currInterrupt.length; i++){
-          if(currInterrupt[i].idx <= 0){
-            console.log("first conditional" + currInterrupt);
-            //setCurrInterrupt(null);
-          }
-          else{
-            console.log("second conditional" + currInterrupt);
-            // setCurrInterrupt({
-            //   "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt.idx - 1 : currInterrupt.idx),
-            //   "promptState": currInterrupt.promptState,
-            //   "animationState": currInterrupt.animationState,
-            //   "active": false,
-            // });
+          //if list moved up, no more need for interruptions associated with removed non-interruption behavior
+          if(currInterrupt[i].idx > 0 || idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx){
             updateArray.push({
-              "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt[i].idx - 1 : currInterrupt[i].idx),
+              "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt[i].idx - 1 : currInterrupt[i].idx), //move the idx up if active index has not changed
               "promptState": currInterrupt[i].promptState,
               "animationState": currInterrupt[i].animationState,
               "active": false,
+              "selected": currInterrupt[i].selected
             });
-            // if(currentInterrupt.idx == lastJsonMessage.current_behavior.curr_behavior_idx){
-            //   sendJsonMessage({
-            //     type: "interrupt",
-            //     promptState,
-            //     animationState,
-            //     token: props.token,
-            //   });
-            // }
+
+            //if current behavior has interrupts after it, send the first interrupt
             if(currInterrupt[i].idx == lastJsonMessage.current_behavior.curr_behavior_idx && !sent){
               sendJsonMessage({
                 type: "interrupt",
-                "prompt": currInterrupt[i].promptState,
-                "animation": currInterrupt[i].animationState,
+                "promptState": currInterrupt[i].promptState,
+                "animationState": currInterrupt[i].animationState,
                 token: props.token,
               });
-              sent = true;
+              sent = true; //prevents sending following interrupts
             }
             
           }
@@ -171,11 +165,93 @@ const App = (props) => {
 
       setMessageHistory(lastJsonMessage.current_behavior.curr_behavior_list);
       setIdxTrack(lastJsonMessage.current_behavior.curr_behavior_idx);
+
+
+      //NOTE: may cause race condition
+      if(idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx){
+        setIdxSelected(idxSelected - 1);
+      }
+      
+      //move the selected index so that it cannot be before the active index
+      if(idxSelected < lastJsonMessage.current_behavior.curr_behavior_idx){
+        setIdxSelected(lastJsonMessage.current_behavior.curr_behavior_idx);
+      }
+
     }}
   }, [lastJsonMessage, props.interruptions]);
 
+  /**
+   * Called when a behavior visualization button is clicked
+   * @param index the index of related non-interruption behavior
+   * @param intIdx (optional) the index of the interruption within the sequence of interruptions
+   */
+  function selectBehavior(index: number, intIdx?: number){
+    //no selecting behaviors prior to current behavior
+    if(index < idxTrack){return;}
+    let updatedInterruptions = [];
+    const interruptActive = (element) => element.active;
+    //intIdx will be undefined if button selected is not an interruption
+    if(typeof intIdx !== 'undefined'){
+      let relativeInd = -1;
+      for(let i = 0; i < currInterrupt.length; i++){
+        if(currInterrupt[i].idx == index){
+          relativeInd = i + intIdx; //new selected interruption's index within currInterruption
+          //check if selection is or is after the active behavior (no selecting behaviors prior to active behavior)
+          if(index == idxTrack && currInterrupt.some(interruptActive)){
+            let valid = false;
+            for(let j = i; j <= relativeInd; j++){
+              if(currInterrupt[j].active){
+                valid = true;
+                break;
+              }
+            }
+            if(!valid){return;}
+          }
+          break;
+        }
+      }
+      //update the list of interruptions with which one is selected
+      updatedInterruptions = currInterrupt.map((element, ind) => {
+        if(ind == relativeInd){
+          return {
+            "idx": element.idx,
+            "promptState": element.promptState,
+            "animationState": element.animationState,
+            "active": element.active,
+            "selected": true, 
+          };
+        }
+        else{
+          return {
+            "idx": element.idx,
+            "promptState": element.promptState,
+            "animationState": element.animationState,
+            "active": element.active,
+            "selected": false
+          };
+        }
+      });
+    }
+    else{
+      //no selecting the non-interruption behavior if it has passed
+      if(index == idxTrack && currInterrupt.some(interruptActive)){return;}
+      //ensures that if a non-interruption was selected that no interruptions are still selected
+      updatedInterruptions = currInterrupt.map((element) => {
+        return {
+          "idx": element.idx,
+          "promptState": element.promptState,
+          "animationState": element.animationState,
+          "active": element.active,
+          "selected": false
+        };
+      });
+    }
+    setIdxSelected(index);
+    setCurrInterrupt(updatedInterruptions);
+  }
 
 
+  //variable holding list of behavior visualizations
   var displayedActivities = (messageHistory &&
     Object.entries(messageHistory).map((message, index) => {
       // console.log("message: " + JSON.stringify(message[1]));
@@ -183,47 +259,50 @@ const App = (props) => {
       const hasPrompt = messageValue.hasOwnProperty("Prompt");
       const hasAnimation = messageValue.hasOwnProperty("Animation");
       const hasFunction = messageValue.hasOwnProperty("function");
-      //TODO: adjust this logic to dealing with multiple interrupts array thing✔
       const interruptActive = (element) => element.active;
-      // const isCurrBehavior =
-      //   (idxTrack == index && (currInterrupt == null || currInterrupt.active == false))
-      //     ? "currBehavior"
-      //     : "";
+      const interruptSelected = (element) => element.selected;
       const isCurrBehavior =
         (idxTrack == index && (!(currInterrupt.some(interruptActive))))
           ? "currBehavior"
           : "";
-      // const isCurrInterrupt = (idxTrack == index && (currInterrupt != null && currInterrupt.active == true))
-      // ? "currBehavior"
-      // : "";
-      // if(currInterrupt != null){
-      //   console.log(`currInterrupt: ${idxTrack == index} ${currInterrupt != null} ${currInterrupt.active == true}`);
-      // }
-      let relevantInterrupt = [];
+      const isSelectedBehavior =
+        (idxSelected == index && (!(currInterrupt.some(interruptSelected))))
+          ? "currBtn"
+          : "";
+      let relevantInterrupt = []; //list of interruptions following directly after this behavior
       for(let i = 0; i < currInterrupt.length; i++){
         if(currInterrupt[i].idx == index){
           relevantInterrupt.push(currInterrupt[i]);
         }
       }
-      let interruptAddition = relevantInterrupt.map((element) => 
-      <div key={"interrupt"} style={{ marginBottom: "20px" }}>
+      let interruptAddition = relevantInterrupt.map((element, j) => {
+      let clname = "";
+      //TODO: need to decide what to do with these different css indicators also need to inform the user what the css stylings mean
+      //styling based off properties
+      if(element.selected){clname += "currBtn";} //this probably has to go first?
+      if(element.active){clname += " currBehavior";}
+      clname += " interrupt";
+      return(
+        //depending on what details the behavior includes a different piece is displayed (order of hierarchy: prompt, animation)
+      <div key={`interrupt ${index}.${j}`} style={{ marginBottom: "20px" }}>
         {element.promptState!=="" ? (
             <Button
               key="Prompt"
               name={`Prompt: ${element.promptState}`}
-              className={(element.active) ? "currBehavior" : ""}
-              onButtonClick={() => {}}
+              className={clname}
+              onButtonClick={() => selectBehavior(index, j)}
             />
           ) : element.animationState!=="" ? (
             <Button
               key="Animation"
               name={`Animation: ${element.animationState}`}
-              className={(element.active) ? "currBehavior" : ""}
-              onButtonClick={() => {}}
+              className={clname}
+              onButtonClick={() => selectBehavior(index, j)}
             />
           ) :  <label>oops</label>}
-      </div>);
+      </div>)});
       return (
+        //depending on what details the behavior includes a different piece is displayed (order of hierarchy: prompt, animation, function)
         <div>
         <div key={index} style={{ marginBottom: "20px" }}>
           {hasPrompt ? (
@@ -232,8 +311,8 @@ const App = (props) => {
               name={`Prompt: ${JSON.stringify(
                 messageValue.Prompt
               )}`}
-              className={isCurrBehavior}
-              onButtonClick={() => {}}
+              className= {`${isCurrBehavior}  ${isSelectedBehavior}`}
+              onButtonClick={() => selectBehavior(index)}
             />
           ) : hasAnimation ? (
             <Button
@@ -241,8 +320,8 @@ const App = (props) => {
               name={`Animation: ${JSON.stringify(
                 messageValue.Animation
               )}`}
-              className={isCurrBehavior}
-              onButtonClick={() => {}}
+              className={`${isCurrBehavior}  ${isSelectedBehavior}`}
+              onButtonClick={() => selectBehavior(index)}
             />
           ) : hasFunction ? (
             <Button
@@ -250,39 +329,20 @@ const App = (props) => {
               name={`Action: ${JSON.stringify(
                 messageValue.function
               )}`}
-              className={isCurrBehavior}
-              onButtonClick={() => {}}
+              className={`${isCurrBehavior}  ${isSelectedBehavior}`}
+              onButtonClick={() => selectBehavior(index)}
             />
           ) : (
             Object.entries(messageValue).map(([key, value]) => (
               <Button
                 key={key}
                 name={`${key}: ${JSON.stringify(value)}`}
-                className={isCurrBehavior}
-                onButtonClick={() => {}}
+                className={`${isCurrBehavior}  ${isSelectedBehavior}`}
+                onButtonClick={() => selectBehavior(index)}
               />
             ))
           )}
         </div>
-        {/* {currInterrupt && currInterrupt.idx == index ? (
-          <div key={"interrupt"} style={{ marginBottom: "20px" }}>
-              {currInterrupt.promptState!=="" ? (
-              <Button
-                key="Prompt"
-                name={`Prompt: ${currInterrupt.promptState}`}
-                className={isCurrInterrupt}
-                onButtonClick={() => {}}
-              />
-            ) : currInterrupt.animationState!=="" ? (
-              <Button
-                key="Animation"
-                name={`Animation: ${currInterrupt.animationState}`}
-                className={isCurrInterrupt}
-                onButtonClick={() => {}}
-              />
-            ) :  <label>oops</label>}
-          </div>
-          ): <></>} */}
           {interruptAddition}
         </div>
       );
@@ -303,65 +363,102 @@ const App = (props) => {
     );
     props.setInterruptions([...props.interruptions, newInterruption]);
     <History interruptions={props.interruptions} />;
-    //this is only true for the first interruption if after current behavior
-    //TODO still needs the logic to send this at specified location
-    sendJsonMessage({
-      type: "interrupt",
-      promptState,
-      animationState,
-      token: props.token,
-    });
-    // setCurrInterrupt({
-    //   "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
-    //   promptState,
-    //   animationState,
-    //   "active": false
-    // });
-    //TODO: this still won't do insert behavior
-    //  currInterrupt.push({
-    //   "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
-    //   promptState,
-    //   animationState,
-    //   "active": false
-    //  });
-    // setCurrInterrupt(currInterrupt.concat([{
-    //   "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
-    //   promptState,
-    //   animationState,
-    //   "active": false,
-    // }]));
-    // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
-    setCurrInterrupt([...currInterrupt, {
-      "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
-      promptState,
-      animationState,
-      "active": false,
-    }]);
+    let updatedInterruptions = [];
+    //if there are other interruptions already visualized
+    if(currInterrupt.length > 0){
+      let index = -1;
+      const interruptSelected = (element) => element.selected;
+      for (let i = 0; i <= currInterrupt.length; i++){
+        if(i == currInterrupt.length || currInterrupt[i].idx >= idxSelected ){
+          index = i;
+          console.log("setting index");
+          //case: a non-interrupt behavior is selected so the new behavior will go right after it
+          if(!currInterrupt.some(interruptSelected)){
+            console.log("opt1: " + i);
+            //if the selected behavior is also the active behavior then the interrupt is sent immediately
+            if(idxSelected == idxTrack){
+              sendJsonMessage({
+                type: "interrupt",
+                promptState,
+                animationState,
+                token: props.token,
+              });
+            }
+            break;
+          }
+          //case: an interrupt is selected
+          //iterate until the last index is the selected behavior 
+          else if (i > 0 && currInterrupt[i-1].selected){
+            console.log("opt2: " + i);
+            //if the selected behavior is also the active behavior then the interrupt is sent immediately
+            if(currInterrupt[i-1].active){
+              sendJsonMessage({
+                type: "interrupt",
+                promptState,
+                animationState,
+                token: props.token,
+              });
+            }
+            break;
+          }
+        }
+      }
+      //update the displayed interruptions list
+      //case: interruption goes at end
+      if(index == currInterrupt.length){
+        console.log("should be at the end");
+        updatedInterruptions = [...currInterrupt, {
+          "idx": idxSelected,
+          promptState,
+          animationState,
+          "active": false,
+          "selected": false
+        }];
+      }
+      //case: update non empty displayed interruption list (new interruption added not at the end of the list)
+      else{
+        for (let i = 0; i < currInterrupt.length; i++){
+          if(i == index){
+            updatedInterruptions.push({
+              "idx": idxSelected,
+              promptState,
+              animationState,
+              "active": false,
+              "selected": false
+            });
+          }
+          updatedInterruptions.push(currInterrupt[i]);
+        }
+      }
+    }
+    //case: no currently displayed interruptions
+    else{
+      //if the selected behavior is also the active behavior then the interrupt is sent immediately
+      if(idxSelected == idxTrack){
+        sendJsonMessage({
+          type: "interrupt",
+          promptState,
+          animationState,
+          token: props.token,
+        });
+      }
+      //update the displayed interruptions list
+      updatedInterruptions.push({
+        "idx": idxSelected,
+        promptState,
+        animationState,
+        "active": false,
+        "selected": false
+      });
+    }
+    setCurrInterrupt(updatedInterruptions);
 
     //I think right here this is a delay updating in time for the console log but it does add it in
     console.log("Checking currinterruption" + currInterrupt.length);
     if(currInterrupt.length > 0){console.log("Checking currinterruption part 2" + currInterrupt[0].promptState);}
 
 
-    // var element = (<div key={"interrupt"} style={{ marginBottom: "20px" }}>
-    //       {promptState!=="" ? (
-    //         <Button
-    //           key="Prompt"
-    //           name={`Prompt: ${promptState}`}
-    //           className={""}
-    //           onButtonClick={() => {}}
-    //         />
-    //       ) : animationState!=="" ? (
-    //         <Button
-    //           key="Animation"
-    //           name={`Animation: ${animationState}`}
-    //           className={""}
-    //           onButtonClick={() => {}}
-    //         />
-    //       ) :  <label>oops</label>}
-    //     </div>
-    // );
-    // displayedActivities.splice(lastJsonMessage.current_behavior.curr_behavior_idx+1,0,element);
+    //reset the input fields
     setPrompt("");
     setAnimation("");
   }
@@ -422,7 +519,7 @@ const App = (props) => {
           />
           <Button
             className=""
-            name="Send"
+            name="Insert"
             onButtonClick={onSendClick}
           />
         </div>

@@ -27,7 +27,11 @@ button.currBtn{
 }
 
 button.currBehavior{
-    border: 10px outset grey;
+    border: 10px solid grey;
+}
+
+button.interrupt{
+    background-color: lightgray;
 }
 
 button.PromptButton{
