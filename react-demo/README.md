@@ -83,6 +83,7 @@ As the
 
 1. Open the web application in a browser.
 2. Enter your username and password, click on the "Connect to CARMEN" button.
+![architecture diagram](images/login.png)
 3. The application is consisted of three pages. The `Logout Page` is used to log out the application. The `App Page` is used to insert interruptions. The `History Page` displays all the interruptions inserted.
 4. You can navigate between the different pages of the application from the web application by clicking on the buttons on the navigation bar.
 
