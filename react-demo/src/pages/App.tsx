@@ -19,10 +19,16 @@ const App = (props) => {
 
   //Get URL and token from previous page
 
+  interface currInter {
+      idx: any; 
+      promptState: string; 
+      animationState: string; 
+      active: boolean; 
+  }
   //Setup state of prompt and animation values
   const [promptState, setPrompt] = useState("");
   const [animationState, setAnimation] = useState("");
-  const [currInterrupt, setCurrInterrupt] = useState(null);
+  const [currInterrupt, setCurrInterrupt] = useState<currInter[]>([]);
   const [idxTrack, setIdxTrack] = useState(null);
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
@@ -58,12 +64,58 @@ const App = (props) => {
       if(lastJsonMessage.current_behavior.interruption != null){
         //TODO: increment to curr behavior with interruption
         console.log("now current behavior is an interrupt");
-        setCurrInterrupt({
-          "idx": currInterrupt.idx,
-          "promptState": currInterrupt.promptState,
-          "animationState": currInterrupt.animationState,
-          "active": true,
+        let index = -1;
+        for (let i = 0; i < currInterrupt.length; i++){
+          if(currInterrupt[i].idx == idxTrack ){
+            if (index == -1 && !(currInterrupt[i].active)){
+              index = i;
+            }
+            else if(currInterrupt[i].active){
+              index = i + 1;
+              break;
+            }
+          }
+        }
+        console.log("INDEX: " + index);
+        //if(index > 0){currInterrupt[index-1].active = false;}
+        //currInterrupt[index].active = true;
+        const updatedInterruptions = currInterrupt.map((element, ind) => {
+          if(ind == index){
+            return {
+              "idx": element.idx,
+              "promptState": element.promptState,
+              "animationState": element.animationState,
+              "active": true,
+            }; //TODO still going dont stop
+          }
+          else{
+            return {
+              "idx": element.idx,
+              "promptState": element.promptState,
+              "animationState": element.animationState,
+              "active": false,
+            };
+          }
         });
+
+        console.log("UPDATED INT: " + updatedInterruptions[0]);
+        setCurrInterrupt(updatedInterruptions);
+
+        if (currInterrupt.length - 1 > index && currInterrupt[index+1].idx == idxTrack){
+          sendJsonMessage({
+            type: "interrupt",
+            "prompt": currInterrupt[index+1].promptState,
+            "animation": currInterrupt[index+1].animationState,
+            token: props.token,
+          });
+        }
+
+        // setCurrInterrupt({
+        //   "idx": currInterrupt.idx,
+        //   "promptState": currInterrupt.promptState,
+        //   "animationState": currInterrupt.animationState,
+        //   "active": true,
+        // });
 
       }
       else if(Array.isArray(lastJsonMessage.current_behavior.curr_behavior_list) &&
@@ -72,28 +124,49 @@ const App = (props) => {
       )
     ) {
       // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
-      if(currInterrupt != null && (messageHistory != lastJsonMessage.current_behavior.curr_behavior_list || idxTrack != lastJsonMessage.current_behavior.curr_behavior_idx)){
-        if(currInterrupt == null || currInterrupt.idx <= 0){
-          console.log("first conditional" + currInterrupt);
-          setCurrInterrupt(null);
+      if(currInterrupt.length > 0 && (messageHistory != lastJsonMessage.current_behavior.curr_behavior_list || idxTrack != lastJsonMessage.current_behavior.curr_behavior_idx)){
+        let updateArray = [];
+        let sent = false;
+        for(let i = 0; i < currInterrupt.length; i++){
+          if(currInterrupt[i].idx <= 0){
+            console.log("first conditional" + currInterrupt);
+            //setCurrInterrupt(null);
+          }
+          else{
+            console.log("second conditional" + currInterrupt);
+            // setCurrInterrupt({
+            //   "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt.idx - 1 : currInterrupt.idx),
+            //   "promptState": currInterrupt.promptState,
+            //   "animationState": currInterrupt.animationState,
+            //   "active": false,
+            // });
+            updateArray.push({
+              "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt[i].idx - 1 : currInterrupt[i].idx),
+              "promptState": currInterrupt[i].promptState,
+              "animationState": currInterrupt[i].animationState,
+              "active": false,
+            });
+            // if(currentInterrupt.idx == lastJsonMessage.current_behavior.curr_behavior_idx){
+            //   sendJsonMessage({
+            //     type: "interrupt",
+            //     promptState,
+            //     animationState,
+            //     token: props.token,
+            //   });
+            // }
+            if(currInterrupt[i].idx == lastJsonMessage.current_behavior.curr_behavior_idx && !sent){
+              sendJsonMessage({
+                type: "interrupt",
+                "prompt": currInterrupt[i].promptState,
+                "animation": currInterrupt[i].animationState,
+                token: props.token,
+              });
+              sent = true;
+            }
+            
+          }
         }
-        else{
-          console.log("second conditional" + currInterrupt);
-          setCurrInterrupt({
-            "idx": ((idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx) ? currInterrupt.idx - 1 : currInterrupt.idx),
-            "promptState": currInterrupt.promptState,
-            "animationState": currInterrupt.animationState,
-            "active": false,
-          });
-          // if(currentInterrupt.idx == lastJsonMessage.current_behavior.curr_behavior_idx){
-          //   sendJsonMessage({
-          //     type: "interrupt",
-          //     promptState,
-          //     animationState,
-          //     token: props.token,
-          //   });
-          // }
-        }
+        setCurrInterrupt(updateArray);
       }
 
       setMessageHistory(lastJsonMessage.current_behavior.curr_behavior_list);
@@ -110,16 +183,46 @@ const App = (props) => {
       const hasPrompt = messageValue.hasOwnProperty("Prompt");
       const hasAnimation = messageValue.hasOwnProperty("Animation");
       const hasFunction = messageValue.hasOwnProperty("function");
+      //TODO: adjust this logic to dealing with multiple interrupts array thing✔
+      const interruptActive = (element) => element.active;
+      // const isCurrBehavior =
+      //   (idxTrack == index && (currInterrupt == null || currInterrupt.active == false))
+      //     ? "currBehavior"
+      //     : "";
       const isCurrBehavior =
-        (idxTrack == index && (currInterrupt == null || currInterrupt.active == false))
+        (idxTrack == index && (!(currInterrupt.some(interruptActive))))
           ? "currBehavior"
           : "";
-      const isCurrInterrupt = (idxTrack == index && (currInterrupt != null && currInterrupt.active == true))
-      ? "currBehavior"
-      : "";
-      if(currInterrupt != null){
-        console.log(`currInterrupt: ${idxTrack == index} ${currInterrupt != null} ${currInterrupt.active == true}`);
+      // const isCurrInterrupt = (idxTrack == index && (currInterrupt != null && currInterrupt.active == true))
+      // ? "currBehavior"
+      // : "";
+      // if(currInterrupt != null){
+      //   console.log(`currInterrupt: ${idxTrack == index} ${currInterrupt != null} ${currInterrupt.active == true}`);
+      // }
+      let relevantInterrupt = [];
+      for(let i = 0; i < currInterrupt.length; i++){
+        if(currInterrupt[i].idx == index){
+          relevantInterrupt.push(currInterrupt[i]);
+        }
       }
+      let interruptAddition = relevantInterrupt.map((element) => 
+      <div key={"interrupt"} style={{ marginBottom: "20px" }}>
+        {element.promptState!=="" ? (
+            <Button
+              key="Prompt"
+              name={`Prompt: ${element.promptState}`}
+              className={(element.active) ? "currBehavior" : ""}
+              onButtonClick={() => {}}
+            />
+          ) : element.animationState!=="" ? (
+            <Button
+              key="Animation"
+              name={`Animation: ${element.animationState}`}
+              className={(element.active) ? "currBehavior" : ""}
+              onButtonClick={() => {}}
+            />
+          ) :  <label>oops</label>}
+      </div>);
       return (
         <div>
         <div key={index} style={{ marginBottom: "20px" }}>
@@ -161,7 +264,7 @@ const App = (props) => {
             ))
           )}
         </div>
-        {currInterrupt && currInterrupt.idx == index ? (
+        {/* {currInterrupt && currInterrupt.idx == index ? (
           <div key={"interrupt"} style={{ marginBottom: "20px" }}>
               {currInterrupt.promptState!=="" ? (
               <Button
@@ -179,7 +282,8 @@ const App = (props) => {
               />
             ) :  <label>oops</label>}
           </div>
-          ): <></>}
+          ): <></>} */}
+          {interruptAddition}
         </div>
       );
     }))
@@ -200,18 +304,45 @@ const App = (props) => {
     props.setInterruptions([...props.interruptions, newInterruption]);
     <History interruptions={props.interruptions} />;
     //this is only true for the first interruption if after current behavior
+    //TODO still needs the logic to send this at specified location
     sendJsonMessage({
       type: "interrupt",
       promptState,
       animationState,
       token: props.token,
     });
-    setCurrInterrupt({
+    // setCurrInterrupt({
+    //   "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
+    //   promptState,
+    //   animationState,
+    //   "active": false
+    // });
+    //TODO: this still won't do insert behavior
+    //  currInterrupt.push({
+    //   "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
+    //   promptState,
+    //   animationState,
+    //   "active": false
+    //  });
+    // setCurrInterrupt(currInterrupt.concat([{
+    //   "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
+    //   promptState,
+    //   animationState,
+    //   "active": false,
+    // }]));
+    // setMessageHistory(prev => [...prev, ...(lastJsonMessage.behavior_list)]);
+    setCurrInterrupt([...currInterrupt, {
       "idx": lastJsonMessage.current_behavior.curr_behavior_idx,
       promptState,
       animationState,
-      "active": false
-    });
+      "active": false,
+    }]);
+
+    //I think right here this is a delay updating in time for the console log but it does add it in
+    console.log("Checking currinterruption" + currInterrupt.length);
+    if(currInterrupt.length > 0){console.log("Checking currinterruption part 2" + currInterrupt[0].promptState);}
+
+
     // var element = (<div key={"interrupt"} style={{ marginBottom: "20px" }}>
     //       {promptState!=="" ? (
     //         <Button
