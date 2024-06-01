@@ -1,5 +1,5 @@
-import { Button } from "../components/Button"; // Import the Button component
-import { TextBox } from "../components/TextBox"; // Import the Textbox component
+import { Button } from "./Button"; // Import the Button component
+import { TextBox } from "./TextBox"; // Import the Textbox component
 
 
 /**

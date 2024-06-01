@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 import { ReadyState } from "react-use-websocket";
 //Import Custom Components
-import { PromptOptions } from "../containers/PromptOptions";
-import { AnimationOptions } from "../containers/AnimationOptions";
+import { PromptOptions } from "../components/PromptOptions";
+import { AnimationOptions } from "../components/AnimationOptions";
 import { Button } from "../components/Button";
 
 import History from "./History";
@@ -87,7 +87,6 @@ const App = (props) => {
         //checks if the previous active behavior was selected
         let prev_sel = (idxSelected == idxTrack && !currInterrupt.some(interruptSelected)) || (index > 0 && currInterrupt[index-1].selected);
         //create an updated list of interruptions that adjust which interruptions are active and selected
-        //NOTE: may not be fully working
         const updatedInterruptions = currInterrupt.map((element, ind) => {
           if(ind == index){
             return {
@@ -166,7 +165,6 @@ const App = (props) => {
       }
 
 
-      // NOTE: may cause race condition
       let updatedIdxSelected = idxSelected;
       if(messageHistory != lastJsonMessage.current_behavior.curr_behavior_list && idxTrack == lastJsonMessage.current_behavior.curr_behavior_idx){
         updatedIdxSelected = idxSelected - 1;

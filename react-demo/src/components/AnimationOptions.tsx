@@ -1,4 +1,4 @@
-import { Button } from "../components/Button"; // Import the Button component
+import { Button } from "./Button"; // Import the Button component
 
 
 /**
