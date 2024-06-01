@@ -21,8 +21,10 @@ div.ButtonContainerRow {
 }
 
 button:not(.PromptButton):not(.AnimationButton){
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 button.currBtn{
