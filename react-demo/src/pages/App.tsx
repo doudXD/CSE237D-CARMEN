@@ -190,7 +190,7 @@ const App = (props) => {
    */
   function selectBehavior(index: number, intIdx?: number){
     //no selecting behaviors prior to current behavior
-    if(index < idxTrack){return;}
+    if(idxTrack == null || index < idxTrack){return;}
     let updatedInterruptions = [];
     const interruptActive = (element) => element.active;
     //intIdx will be undefined if button selected is not an interruption
@@ -353,6 +353,10 @@ const App = (props) => {
   
   function onSendClick(){
     //send JSON with prompt and animation and reset respective states
+    if(promptState == "" && animationState == ""){
+      console.log("nope. that's empty. tsk tsk");
+      return;
+    }
     console.log("sending");
     console.log(promptState);
     console.log(animationState);
