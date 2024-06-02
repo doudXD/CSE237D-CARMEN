@@ -8,6 +8,8 @@ const Logout = (props) => {
     if (loggedIn) {
       localStorage.removeItem("user");
       props.setLoggedIn(false);
+      props.setToken("");
+      props.setSocketUrl("");
       navigate("/");
     }
   };

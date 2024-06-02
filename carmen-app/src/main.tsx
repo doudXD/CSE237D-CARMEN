@@ -38,7 +38,14 @@ const Main = () => {
           />
           <Route
             path="/logout"
-            element={<Logout loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
+            element={
+              <Logout
+                loggedIn={loggedIn}
+                setLoggedIn={setLoggedIn}
+                setToken={setToken}
+                setSocketUrl={setSocketUrl}
+              />
+            }
           />
           <Route
             path="/history"
