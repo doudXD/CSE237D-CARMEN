@@ -300,7 +300,7 @@ const App = (props) => {
           : "";
       const isSelectedBehavior =
         idxSelected == index && !currInterrupt.some(interruptSelected)
-          ? "currBtn"
+          ? "selectedButton"
           : "";
       let relevantInterrupt = []; //list of interruptions following directly after this behavior
       for (let i = 0; i < currInterrupt.length; i++) {
@@ -309,11 +309,11 @@ const App = (props) => {
         }
       }
       let interruptAddition = relevantInterrupt.map((element, j) => {
-        let clname = "";
+        let clname = "displayButton";
         //TODO: need to decide what to do with these different css indicators also need to inform the user what the css stylings mean
         //styling based off properties
         if (element.selected) {
-          clname += "currBtn";
+          clname += " selectedButton";
         } //this probably has to go first?
         if (element.active) {
           clname += " currBehavior";
@@ -321,7 +321,16 @@ const App = (props) => {
         clname += " interrupt";
         return (
           //depending on what details the behavior includes a different piece is displayed (order of hierarchy: prompt, animation)
-          <div key={`interrupt ${index}.${j}`} style={{ marginBottom: "20px" }}>
+          <div
+            key={`interrupt ${index}.${j}`}
+            style={{ marginBottom: "20px", display: "flex" }}>
+            <label
+              style={{
+                fontWeight: "bold",
+                marginLeft: "50px",
+              }}>
+              New!
+            </label>
             {element.promptState !== "" ? (
               <Button
                 key="Prompt"
@@ -350,21 +359,22 @@ const App = (props) => {
               <Button
                 key="Prompt"
                 name={`Prompt: ${JSON.stringify(messageValue.Prompt)}`}
-                className={`${isCurrBehavior}  ${isSelectedBehavior}`}
+                // className="displayButton"
+                className={`displayButton ${isCurrBehavior}  ${isSelectedBehavior}`}
                 onButtonClick={() => selectBehavior(index)}
               />
             ) : hasAnimation ? (
               <Button
                 key="Animation"
                 name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
-                className={`${isCurrBehavior}  ${isSelectedBehavior}`}
+                className={`displayButton ${isCurrBehavior}  ${isSelectedBehavior}`}
                 onButtonClick={() => selectBehavior(index)}
               />
             ) : hasFunction ? (
               <Button
                 key="function"
                 name={`Action: ${JSON.stringify(messageValue.function)}`}
-                className={`${isCurrBehavior}  ${isSelectedBehavior}`}
+                className={`displayButton ${isCurrBehavior}  ${isSelectedBehavior}`}
                 onButtonClick={() => selectBehavior(index)}
               />
             ) : (

@@ -32,7 +32,7 @@ function PromptOptions({
         <Button
           //if button's prompt matches current prompt value, mark it as current(active?) button
           className={promptState == "Congrats" ? "currBtn" : "PromptButton"}
-          name="Congratulate"
+          name="Congrat"
           onButtonClick={() => setPrompt("Congrats")}
         />
         <Button

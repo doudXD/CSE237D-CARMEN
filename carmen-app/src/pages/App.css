@@ -28,7 +28,7 @@ button:not(.PromptButton):not(.AnimationButton){
 }
 
 button.currBtn {
-    width: 250px;
+    width: 150px;
     font-size: 20px !important;
     border-radius: 20px;
     background-color: grey;
@@ -56,17 +56,14 @@ button.currBtn:active {
     color: white;
 }
 
-button.currBehavior{
-    border: 10px solid grey;
-}
 
 button.interrupt{
-    background-color: lightgray;
+    margin-left: 20px;
 }
 
 button.PromptButton{
     font-size: 20px !important;
-    width: 250px;
+    width: 150px;
     border-radius: 20px;
     color: grey;
     border-color: grey;
@@ -93,7 +90,7 @@ button.PromptButton:active {
 
 button.AnimationButton{
     font-size: 20px !important;
-    width: 250px;
+    width: 150px !important;
     border-radius: 20px;
     color: grey;
     border-color: grey;
@@ -131,4 +128,35 @@ button.insertButton:hover {
     background-color: grey;
     border-color: grey;
     transform: scale(1.05);
+}
+
+button.displayButton{
+    background-color: #f9f9f9 !important;
+    border-color: #f9f9f9 !important;
+    color: rgb(100, 93, 93) !important;
+    text-align: left;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    font-size: 25px !important;
+    width: 800px;
+    height: 80px;
+}
+
+button.displayButton:hover {
+    background-color: grey !important;
+    border-color: grey !important;
+    color: white !important;
+}
+
+button.selectedButton{
+    background-color: grey !important;
+    border-color: grey !important;
+    color: white !important;
+}
+
+button.currBehavior {
+    font-weight: bold;
+    border-width: 10px !important;
+    border-color: grey !important;
 }
