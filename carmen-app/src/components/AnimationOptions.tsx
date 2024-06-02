@@ -18,14 +18,14 @@ function AnimationOptions({
   //three buttons in top row, three buttons in bottom row
   return (
     <div className="promptOptions">
-      <h2
+      <h5
         style={{
           color: "grey",
           paddingTop: "10px",
-          paddingLeft: "40px",
+          paddingLeft: "10px",
         }}>
         Animation
-      </h2>
+      </h5>
       <div className="ButtonContainerRow">
         <Button
           //if button's animation matches current animation value, mark it as current(active?) button

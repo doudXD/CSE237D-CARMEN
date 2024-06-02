@@ -40,7 +40,7 @@ function TextBox({
         style={{
           marginRight: "10px",
           //   fontWeight: "bold",
-          fontSize: "30px",
+          fontSize: "20px",
           color: "grey",
         }}>
         Customized Prompt:
@@ -55,9 +55,9 @@ function TextBox({
       />
       <h4
         style={{
-          marginTop: "40px",
+          marginTop: "20px",
           fontWeight: "bold",
-          fontSize: "30px",
+          fontSize: "20px",
           color: "grey",
         }}>
         {" "}

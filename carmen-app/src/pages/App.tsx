@@ -548,9 +548,9 @@ const App = (props) => {
             marginBottom: "100px",
             justifyContent: "center",
             alignItems: "stretch",
-            marginTop: "8%",
+            marginTop: "10%",
             padding: "0% 5%",
-            gap: "15px",
+            gap: "10px",
           }}>
           <PromptOptions setPrompt={setPrompt} promptState={promptState} />
           <AnimationOptions

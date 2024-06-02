@@ -20,14 +20,14 @@ function PromptOptions({
   // two buttons in top row, one custom input textbox in bottom row
   return (
     <div className="promptOptions">
-      <h2
+      <h5
         style={{
           color: "grey",
-          paddingTop: "10px",
-          paddingLeft: "40px",
+          paddingTop: "5px",
+          paddingLeft: "10px",
         }}>
         Prompt
-      </h2>
+      </h5>
       <div className="ButtonContainerRow">
         <Button
           //if button's prompt matches current prompt value, mark it as current(active?) button

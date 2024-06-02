@@ -29,7 +29,8 @@ button:not(.PromptButton):not(.AnimationButton){
 
 button.currBtn {
     width: 250px;
-    border-radius: 30px;
+    font-size: 20px !important;
+    border-radius: 20px;
     background-color: grey;
     border-width: 5px;
     border-color: grey;
@@ -43,6 +44,7 @@ button.currBtn:hover {
 }
 
 button.currBtn:focus {
+
     background-color: grey;
     border-color: grey;
     color: white;
@@ -63,8 +65,9 @@ button.interrupt{
 }
 
 button.PromptButton{
+    font-size: 20px !important;
     width: 250px;
-    border-radius: 30px;
+    border-radius: 20px;
     color: grey;
     border-color: grey;
     border-width: 5px;
@@ -89,8 +92,9 @@ button.PromptButton:active {
 }
 
 button.AnimationButton{
+    font-size: 20px !important;
     width: 250px;
-    border-radius: 30px;
+    border-radius: 20px;
     color: grey;
     border-color: grey;
     border-width: 5px;
