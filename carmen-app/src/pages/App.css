@@ -27,9 +27,30 @@ button:not(.PromptButton):not(.AnimationButton){
     max-width: 100%;
 }
 
-button.currBtn{
-    /*not sure what other colors we were using so I just grabbed a color in a similar area*/
-    background-color: rgb(47, 98, 252);
+button.currBtn {
+    width: 250px;
+    border-radius: 30px;
+    background-color: grey;
+    border-width: 5px;
+    border-color: grey;
+    color: white;
+    cursor: pointer;
+}
+
+button.currBtn:hover {
+    background-color: grey;
+    border-color: grey;
+}
+
+button.currBtn:focus {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.currBtn:active {
+    background-color: grey;
+    border-color: grey;
     color: white;
 }
 
@@ -42,9 +63,68 @@ button.interrupt{
 }
 
 button.PromptButton{
-    width: 240px;
+    width: 250px;
+    border-radius: 30px;
+    color: grey;
+    border-color: grey;
+    border-width: 5px;
+    cursor: pointer;
+}
+
+button.PromptButton:hover {
+    background-color: grey;
+    border-color: grey;
+}
+
+button.PromptButton:focus {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.PromptButton:active {
+    background-color: grey;
+    border-color: grey;
+    color: white;
 }
 
 button.AnimationButton{
-    width: 140px;
+    width: 250px;
+    border-radius: 30px;
+    color: grey;
+    border-color: grey;
+    border-width: 5px;
+    cursor: pointer;
+}
+
+button.AnimationButton:hover {
+    background-color: grey;
+    border-color: grey;
+}
+
+button.AnimationButton:focus {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.AnimationButton:active {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.insertButton{
+    margin-top: 10px;
+    background-color: grey;
+    border-radius: 30px;
+    border-color: grey;
+    color: white;
+    cursor: pointer;
+}
+
+button.insertButton:hover {
+    background-color: grey;
+    border-color: grey;
+    transform: scale(1.05);
 }

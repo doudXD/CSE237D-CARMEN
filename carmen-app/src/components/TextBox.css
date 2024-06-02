@@ -1,0 +1,20 @@
+.textBox {
+    margin-left: 10px;
+    width: 500px;
+    /* Adjust width as needed */
+    height: 70px;
+    /* Adjust height as needed */
+    font-size: 25px;
+    /* Adjust font size as needed */
+    border-radius: 20px;
+    /* Adjust border radius as needed */
+    border-top: 4px solid grey;
+    border-left: 4px solid grey;
+    border-color: grey;
+    border-width: 5px;
+    /* Adjust border width as needed */
+}
+
+.textBox:focus {
+    outline: none;
+}
