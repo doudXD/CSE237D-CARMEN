@@ -12,15 +12,15 @@ const History = (props) => {
           .map((interruption, index) => (
             <div key={index} className="interruptionContainer">
               <div className="promptContainer">
-                <h2>Prompt</h2>
+                <h5>Prompt</h5>
                 <p>{interruption.promptState}</p>
               </div>
               <div className="animationContainer">
-                <h2>Animation</h2>
+                <h5>Animation</h5>
                 <p>{interruption.animationState}</p>
               </div>
               <div className="timeContainer">
-                <h2>Time</h2>
+                <h5>Time</h5>
                 <p>{new Date(interruption.time).toLocaleString()}</p>
               </div>
             </div>
