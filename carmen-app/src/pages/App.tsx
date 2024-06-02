@@ -561,6 +561,7 @@ const App = (props) => {
             marginTop: "10%",
             padding: "0% 5%",
             gap: "10px",
+            minWidth: "500px"
           }}>
           <PromptOptions setPrompt={setPrompt} promptState={promptState} />
           <AnimationOptions
