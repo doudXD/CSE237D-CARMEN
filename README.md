@@ -123,7 +123,7 @@ As the full CARMEN system is not currently fully open source, we are unable to s
 
 ### Final Project Video
 
-TBA: To be added by 6/12/2024
+[Link to Final Demo Video] (https://drive.google.com/file/d/13L6k8ccjIZ-TBFurMbwyRkE3ILKpaEMu/view?usp=sharing)
 
 ---
 
