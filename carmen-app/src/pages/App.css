@@ -27,6 +27,21 @@ button:not(.PromptButton):not(.AnimationButton){
     max-width: 100%;
 }
 
+/* container for activity list buttons and expand buttons */
+.button-container {
+    display: flex;
+    align-items: center;
+}
+  
+/* style for clickable expand button */
+.expand-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+
 button.currBtn {
     width: 150px;
     font-size: 20px !important;
@@ -59,6 +74,9 @@ button.currBtn:active {
 
 button.interrupt{
     margin-left: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
 }
 
 button.PromptButton{

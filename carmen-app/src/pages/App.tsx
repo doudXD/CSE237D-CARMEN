@@ -33,7 +33,8 @@ const App = (props) => {
   const [currInterrupt, setCurrInterrupt] = useState<currInter[]>([]); //list of currently displayed interruptions
   const [idxTrack, setIdxTrack] = useState(null); //the index of the current behavior according to the last current behavior list json
   const [idxSelected, setIdxSelected] = useState(0); //the index of the selected behavior (or associated non-interruption behavior)
-
+  const [expandButtonIdx, setExpandButtonIdx] = useState<number | null>(null);
+  
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     props.socketUrl,
@@ -209,6 +210,14 @@ const App = (props) => {
     }
   }, [lastJsonMessage]);
 
+
+  //to manage button extension
+  //if the clicked button is already expanded, it collapses the button by setting expandButtonIdx to null
+  //if the clicked button is not expanded, it sets expandButtonIdx to the index of the clicked button, causing it to expand
+  const handleButtonClick = (index: number) => {
+    setExpandButtonIdx(index === expandButtonIdx ? null : index);
+  };
+
   /**
    * Called when a behavior visualization button is clicked
    * @param index the index of related non-interruption behavior
@@ -337,6 +346,8 @@ const App = (props) => {
                 name={`Prompt: "${element.promptState}"`}
                 className={clname}
                 onButtonClick={() => selectBehavior(index, j)}
+                isExpanded={index === expandButtonIdx}
+                onExpandClick={() => handleButtonClick(index)}
               />
             ) : element.animationState !== "" ? (
               <Button
@@ -344,6 +355,8 @@ const App = (props) => {
                 name={`Animation: "${element.animationState}"`}
                 className={clname}
                 onButtonClick={() => selectBehavior(index, j)}
+                isExpanded={index === expandButtonIdx}
+                onExpandClick={() => handleButtonClick(index)}
               />
             ) : (
               <label>oops</label>
@@ -362,6 +375,8 @@ const App = (props) => {
                 // className="displayButton"
                 className={`displayButton ${isCurrBehavior}  ${isSelectedBehavior}`}
                 onButtonClick={() => selectBehavior(index)}
+                isExpanded={index === expandButtonIdx}
+                onExpandClick={() => handleButtonClick(index)}
               />
             ) : hasAnimation ? (
               <Button
@@ -369,6 +384,8 @@ const App = (props) => {
                 name={`Animation: ${JSON.stringify(messageValue.Animation)}`}
                 className={`displayButton ${isCurrBehavior}  ${isSelectedBehavior}`}
                 onButtonClick={() => selectBehavior(index)}
+                isExpanded={index === expandButtonIdx}
+                onExpandClick={() => handleButtonClick(index)}
               />
             ) : hasFunction ? (
               <Button
@@ -376,6 +393,8 @@ const App = (props) => {
                 name={`Action: ${JSON.stringify(messageValue.function)}`}
                 className={`displayButton ${isCurrBehavior}  ${isSelectedBehavior}`}
                 onButtonClick={() => selectBehavior(index)}
+                isExpanded={index === expandButtonIdx}
+                onExpandClick={() => handleButtonClick(index)}
               />
             ) : (
               Object.entries(messageValue).map(([key, value]) => (
@@ -384,6 +403,8 @@ const App = (props) => {
                   name={`${key}: ${JSON.stringify(value)}`}
                   className={`${isCurrBehavior}  ${isSelectedBehavior}`}
                   onButtonClick={() => selectBehavior(index)}
+                  isExpanded={index === expandButtonIdx}
+                  onExpandClick={() => handleButtonClick(index)}
                 />
               ))
             )}
