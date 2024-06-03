@@ -76,7 +76,7 @@ button.interrupt{
     margin-left: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
-    
+    width: 480px !important;
 }
 
 button.PromptButton{
