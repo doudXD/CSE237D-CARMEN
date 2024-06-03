@@ -89,7 +89,7 @@ Clone the repository and follow these steps to run the application:
 
 #### Mock Server Deployment
 The mockserver code can be found in the **./src/backend** files.
-1. Navigate into the folder。
+1. Navigate into the folder.
 2. Run `node server.js` to run the server on localhost.
 #### CARMEN Deployment
 
