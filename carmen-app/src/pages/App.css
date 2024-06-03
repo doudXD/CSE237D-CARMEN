@@ -1,0 +1,180 @@
+div.ButtonContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px 40px;
+    /* margin-right: "10%"; */
+    gap: 20px;
+    border: 5px outset black;
+}
+
+div.ButtonContainerRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* padding: 25px 50px 75px 100px; */
+    /* margin-right: "10%"; */
+    gap: 20px;
+    /* border: 5px outset black; */
+}
+
+button:not(.PromptButton):not(.AnimationButton){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* container for activity list buttons and expand buttons */
+.button-container {
+    display: flex;
+    align-items: center;
+}
+  
+/* style for clickable expand button */
+.expand-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+
+button.currBtn {
+    width: 150px;
+    font-size: 20px !important;
+    border-radius: 20px;
+    background-color: grey;
+    border-width: 5px;
+    border-color: grey;
+    color: white;
+    cursor: pointer;
+}
+
+button.currBtn:hover {
+    background-color: grey;
+    border-color: grey;
+}
+
+button.currBtn:focus {
+
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.currBtn:active {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+
+button.interrupt{
+    margin-left: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+}
+
+button.PromptButton{
+    font-size: 20px !important;
+    width: 150px;
+    border-radius: 20px;
+    color: grey;
+    border-color: grey;
+    border-width: 5px;
+    cursor: pointer;
+}
+
+button.PromptButton:hover {
+    background-color: grey;
+    border-color: grey;
+}
+
+button.PromptButton:focus {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.PromptButton:active {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.AnimationButton{
+    font-size: 20px !important;
+    width: 150px !important;
+    border-radius: 20px;
+    color: grey;
+    border-color: grey;
+    border-width: 5px;
+    cursor: pointer;
+}
+
+button.AnimationButton:hover {
+    background-color: grey;
+    border-color: grey;
+}
+
+button.AnimationButton:focus {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.AnimationButton:active {
+    background-color: grey;
+    border-color: grey;
+    color: white;
+}
+
+button.insertButton{
+    margin-top: 10px;
+    background-color: grey;
+    border-radius: 30px;
+    border-color: grey;
+    color: white;
+    cursor: pointer;
+}
+
+button.insertButton:hover {
+    background-color: grey;
+    border-color: grey;
+    transform: scale(1.05);
+}
+
+button.displayButton{
+    background-color: #f9f9f9 !important;
+    border-color: #f9f9f9 !important;
+    color: rgb(100, 93, 93) !important;
+    text-align: left;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    font-size: 25px !important;
+    width: 800px;
+    height: 80px;
+}
+
+button.displayButton:hover {
+    background-color: grey !important;
+    border-color: grey !important;
+    color: white !important;
+}
+
+button.selectedButton{
+    background-color: grey !important;
+    border-color: grey !important;
+    color: white !important;
+}
+
+button.currBehavior {
+    font-weight: bold;
+    border-width: 10px !important;
+    border-color: grey !important;
+}
