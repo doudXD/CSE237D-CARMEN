@@ -119,8 +119,6 @@ As the full CARMEN system is not currently fully open source, we are unable to s
 
 [Link to Demo](https://drive.google.com/file/d/1l5EyJ71iEKnRkgLNaQvXFNTW-6tjZwfK/view?usp=sharing)
 
-### Version 2 Demonstration
-
 ### Final Project Video
 
 [Link to Final Demo Video] (https://drive.google.com/file/d/13L6k8ccjIZ-TBFurMbwyRkE3ILKpaEMu/view?usp=sharing)
